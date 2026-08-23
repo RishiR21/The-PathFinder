@@ -129,6 +129,7 @@ class TerrainUI {
     this.updateRegionDropdown();
     this.updateWishlistCount();
     this.updateJourneyCount();
+    this.updateResetButtonState();
 
     window.addEventListener("resize", () => this.updatePillScrollButtons());
   }
@@ -468,6 +469,7 @@ class TerrainUI {
       this.map.updateParks(filteredParks);
       this.renderParksList(filteredParks);
       this.updateCounter(filteredParks.length);
+      this.updateResetButtonState();
     });
 
     // Storage Event Subscriptions
@@ -817,7 +819,19 @@ function getFlagSvg(country) {
     }
     const pills = this.dom.tagPillsContainer?.querySelectorAll(".filter-tag-pill") || [];
     pills.forEach(p => p.classList.remove("is-active"));
+    this.updateResetButtonState();
     this.showToast("All filters reset", "info");
+  }
+
+  updateResetButtonState() {
+    if (!this.dom.resetFiltersBtn) return;
+    const hasActive = this.filter.hasActiveFilters();
+    this.dom.resetFiltersBtn.classList.toggle("has-active-filters", hasActive);
+    if (hasActive) {
+      this.dom.resetFiltersBtn.setAttribute("title", "Filters active — Click to reset all");
+    } else {
+      this.dom.resetFiltersBtn.setAttribute("title", "Clear all active filters");
+    }
   }
 
   // --- Log Park Visit Dialog ---

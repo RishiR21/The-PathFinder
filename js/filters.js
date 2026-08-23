@@ -229,6 +229,20 @@ class FilterEngine {
         });
     }
   }
+
+  hasActiveFilters() {
+    const { mode, country, stateProvince, searchQuery, selectedTags, sortBy, favoritesOnly, visitedOnly } = this.state;
+    return (
+      mode !== "all" ||
+      country !== "all" ||
+      stateProvince !== "all" ||
+      (searchQuery && searchQuery.trim().length > 0) ||
+      selectedTags.size > 0 ||
+      sortBy !== "featured" ||
+      favoritesOnly ||
+      visitedOnly
+    );
+  }
 }
 
 if (typeof window !== "undefined") {
