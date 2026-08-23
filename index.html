@@ -188,7 +188,49 @@
           </button>
         </div>
       </div>
+
+      <!-- Floating Mobile View Switcher (Map vs. List) -->
+      <div id="mobile-view-toggle" class="mobile-view-toggle" role="group" aria-label="Mobile View Mode">
+        <button id="mobile-btn-map" class="mobile-view-btn is-active" data-view="map">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></svg>
+          <span>Map</span>
+        </button>
+        <button id="mobile-btn-list" class="mobile-view-btn" data-view="list">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M4 10.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5zm0-6c-.83 0-1.5.67-1.5 1.5S3.17 7.5 4 7.5 5.5 6.83 5.5 6 4.83 4.5 4 4.5zm0 12c-.83 0-1.5.68-1.5 1.5s.68 1.5 1.5 1.5 1.5-.68 1.5-1.5-.67-1.5-1.5-1.5zM7 19h14v-2H7v2zm0-6h14v-2H7v2zm0-8v2h14V5H7z"/></svg>
+          <span>List (<span id="mobile-list-count">112</span>)</span>
+        </button>
+      </div>
     </main>
+
+    <!-- Mobile Bottom Navigation Dock (Visible on Mobile Only) -->
+    <nav id="mobile-bottom-nav" class="mobile-bottom-nav" aria-label="Mobile Navigation">
+      <button id="mobile-nav-map-btn" class="mobile-nav-item is-active" title="Map &amp; List Explorer">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></svg>
+        <span>Explore</span>
+      </button>
+      <button id="mobile-nav-journey-btn" class="mobile-nav-item" title="My Journey">
+        <div class="mobile-nav-icon-wrap">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2L4 14h4l-3 6h14l-3-6h4L12 2zm-1 18h2v3h-2v-3z"/></svg>
+          <span id="mobile-journey-badge" class="mobile-badge" style="display: none;">0</span>
+        </div>
+        <span>Journey</span>
+      </button>
+      <button id="mobile-nav-wishlist-btn" class="mobile-nav-item" title="Wishlist">
+        <div class="mobile-nav-icon-wrap">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+          <span id="mobile-wishlist-badge" class="mobile-badge" style="display: none;">0</span>
+        </div>
+        <span>Wishlist</span>
+      </button>
+      <button id="mobile-nav-surprise-btn" class="mobile-nav-item" title="Discover Random Park">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM7.5 18c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm0-9C6.67 9 6 8.33 6 7.5S6.67 6 7.5 6 9 6.67 9 7.5 8.33 9 7.5 9zm4.5 4.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4.5 4.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm0-9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+        <span>Surprise</span>
+      </button>
+      <button id="mobile-nav-about-btn" class="mobile-nav-item" title="About PathFinder">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+        <span>About</span>
+      </button>
+    </nav>
 
     <!-- Park Detail Drawer (Slides from Right) -->
     <div id="detail-drawer" class="terrain-drawer" role="dialog" aria-modal="true" aria-label="Park Details">

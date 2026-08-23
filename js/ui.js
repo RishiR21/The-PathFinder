@@ -106,9 +106,23 @@ class TerrainUI {
       filterVisitedCount: document.getElementById("filter-visited-count"),
       basemapSelect: document.getElementById("basemap-select"),
 
+      // Mobile Navigation & View Controls
+      mobileBtnMap: document.getElementById("mobile-btn-map"),
+      mobileBtnList: document.getElementById("mobile-btn-list"),
+      mobileListCount: document.getElementById("mobile-list-count"),
+      mobileNavMapBtn: document.getElementById("mobile-nav-map-btn"),
+      mobileNavJourneyBtn: document.getElementById("mobile-nav-journey-btn"),
+      mobileNavWishlistBtn: document.getElementById("mobile-nav-wishlist-btn"),
+      mobileNavSurpriseBtn: document.getElementById("mobile-nav-surprise-btn"),
+      mobileNavAboutBtn: document.getElementById("mobile-nav-about-btn"),
+      mobileJourneyBadge: document.getElementById("mobile-journey-badge"),
+      mobileWishlistBadge: document.getElementById("mobile-wishlist-badge"),
+
       // Toast container
       toastContainer: document.getElementById("toast-container")
     };
+
+    this.mobileView = "map";
 
     this.initEventListeners();
     this.renderTagPills();
@@ -386,6 +400,31 @@ class TerrainUI {
       this.dom.photoLightboxBackdrop.addEventListener("click", () => this.closePhotoLightbox());
     }
 
+    // Mobile View Toggle (Map ↔ List)
+    if (this.dom.mobileBtnMap) {
+      this.dom.mobileBtnMap.addEventListener("click", () => this.setMobileView("map"));
+    }
+    if (this.dom.mobileBtnList) {
+      this.dom.mobileBtnList.addEventListener("click", () => this.setMobileView("list"));
+    }
+
+    // Mobile Bottom Navigation Dock
+    if (this.dom.mobileNavMapBtn) {
+      this.dom.mobileNavMapBtn.addEventListener("click", () => this.setMobileView(this.mobileView === "map" ? "list" : "map"));
+    }
+    if (this.dom.mobileNavJourneyBtn) {
+      this.dom.mobileNavJourneyBtn.addEventListener("click", () => this.openJourneyModal());
+    }
+    if (this.dom.mobileNavWishlistBtn) {
+      this.dom.mobileNavWishlistBtn.addEventListener("click", () => this.openWishlist());
+    }
+    if (this.dom.mobileNavSurpriseBtn) {
+      this.dom.mobileNavSurpriseBtn.addEventListener("click", () => this.triggerSurpriseMe());
+    }
+    if (this.dom.mobileNavAboutBtn) {
+      this.dom.mobileNavAboutBtn.addEventListener("click", () => this.openAboutModal());
+    }
+
     // Global Keybindings
     window.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
@@ -440,6 +479,10 @@ class TerrainUI {
       this.dom.wishlistBadgeCount.textContent = count;
       this.dom.wishlistBadgeCount.style.display = count > 0 ? "inline-block" : "none";
     }
+    if (this.dom.mobileWishlistBadge) {
+      this.dom.mobileWishlistBadge.textContent = count;
+      this.dom.mobileWishlistBadge.style.display = count > 0 ? "inline-block" : "none";
+    }
   }
 
   updateJourneyCount() {
@@ -447,6 +490,10 @@ class TerrainUI {
     if (this.dom.journeyBadgeCount) {
       this.dom.journeyBadgeCount.textContent = count;
       this.dom.journeyBadgeCount.style.display = count > 0 ? "inline-block" : "none";
+    }
+    if (this.dom.mobileJourneyBadge) {
+      this.dom.mobileJourneyBadge.textContent = count;
+      this.dom.mobileJourneyBadge.style.display = count > 0 ? "inline-block" : "none";
     }
     if (this.dom.filterVisitedCount) {
       this.dom.filterVisitedCount.textContent = count;
@@ -700,6 +747,32 @@ function getFlagSvg(country) {
       const modeLabel = mode === "national" ? "National Parks" : mode === "state" ? "State/Provincial Parks" : "Parks";
       this.dom.resultsCounter.innerHTML = `Showing <strong>${count}</strong> ${modeLabel}`;
     }
+    if (this.dom.mobileListCount) {
+      this.dom.mobileListCount.textContent = count;
+    }
+  }
+
+  setMobileView(view) {
+    this.mobileView = view;
+    if (view === "list") {
+      document.body.classList.add("mobile-view-list");
+    } else {
+      document.body.classList.remove("mobile-view-list");
+    }
+
+    if (this.dom.mobileBtnMap) {
+      this.dom.mobileBtnMap.classList.toggle("is-active", view === "map");
+    }
+    if (this.dom.mobileBtnList) {
+      this.dom.mobileBtnList.classList.toggle("is-active", view === "list");
+    }
+
+    // Trigger map canvas resize recalculation
+    setTimeout(() => {
+      if (this.map && this.map.map) {
+        this.map.map.invalidateSize();
+      }
+    }, 150);
   }
 
   triggerSurpriseMe() {
