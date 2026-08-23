@@ -90,6 +90,8 @@ class TerrainUI {
       searchInput: document.getElementById("search-input"),
       searchClearBtn: document.getElementById("search-clear-btn"),
       tagPillsContainer: document.getElementById("tag-pills-container"),
+      tagPillsScrollLeft: document.getElementById("tag-pills-scroll-left"),
+      tagPillsScrollRight: document.getElementById("tag-pills-scroll-right"),
       resetFiltersBtn: document.getElementById("reset-filters-btn"),
       fitBoundsBtn: document.getElementById("fit-bounds-btn"),
       recenterBtn: document.getElementById("recenter-btn"),
@@ -106,25 +108,26 @@ class TerrainUI {
     this.updateRegionDropdown();
     this.updateWishlistCount();
     this.updateJourneyCount();
+
+    window.addEventListener("resize", () => this.updatePillScrollButtons());
   }
 
   initEventListeners() {
-    // Mode toggles
+    // Mode Switcher Buttons
     this.dom.modeToggles.forEach(btn => {
       btn.addEventListener("click", () => {
-        this.dom.modeToggles.forEach(b => b.classList.remove("is-active"));
-        btn.classList.add("is-active");
-        this.filter.setMode(btn.getAttribute("data-mode-toggle"));
+        const mode = btn.getAttribute("data-mode-toggle");
+        this.filter.setMode(mode);
+        this.dom.modeToggles.forEach(b => b.classList.toggle("is-active", b === btn));
       });
     });
 
-    // Country toggles
+    // Country Switcher Buttons
     this.dom.countryToggles.forEach(btn => {
       btn.addEventListener("click", () => {
-        this.dom.countryToggles.forEach(b => b.classList.remove("is-active"));
-        btn.classList.add("is-active");
-        this.filter.setCountry(btn.getAttribute("data-country-toggle"));
-        this.updateRegionDropdown();
+        const country = btn.getAttribute("data-country-toggle");
+        this.filter.setCountry(country);
+        this.dom.countryToggles.forEach(b => b.classList.toggle("is-active", b === btn));
       });
     });
 
@@ -174,6 +177,34 @@ class TerrainUI {
         this.dom.searchClearBtn.style.display = "none";
         this.filter.setSearchQuery("");
       });
+    }
+
+    // Tag Pills Scroll Buttons & Wheel Navigation
+    if (this.dom.tagPillsScrollLeft) {
+      this.dom.tagPillsScrollLeft.addEventListener("click", () => {
+        if (this.dom.tagPillsContainer) {
+          this.dom.tagPillsContainer.scrollBy({ left: -220, behavior: "smooth" });
+        }
+      });
+    }
+    if (this.dom.tagPillsScrollRight) {
+      this.dom.tagPillsScrollRight.addEventListener("click", () => {
+        if (this.dom.tagPillsContainer) {
+          this.dom.tagPillsContainer.scrollBy({ left: 220, behavior: "smooth" });
+        }
+      });
+    }
+    if (this.dom.tagPillsContainer) {
+      this.dom.tagPillsContainer.addEventListener("scroll", () => {
+        this.updatePillScrollButtons();
+      }, { passive: true });
+      this.dom.tagPillsContainer.addEventListener("wheel", (e) => {
+        if (e.deltaY !== 0) {
+          e.preventDefault();
+          this.dom.tagPillsContainer.scrollLeft += e.deltaY;
+          this.updatePillScrollButtons();
+        }
+      }, { passive: false });
     }
 
     // Reset Filters
@@ -591,11 +622,11 @@ function getFlagSvg(country) {
     if (!this.dom.tagPillsContainer) return;
     this.dom.tagPillsContainer.innerHTML = "";
 
-    const tags = this.filter.getAllTags().slice(0, 14);
+    const tags = this.filter.getAllTags();
 
     tags.forEach(({ tag, count }) => {
       const pill = document.createElement("button");
-      pill.className = "filter-tag-pill";
+      pill.className = `filter-tag-pill ${this.filter.state.selectedTags.has(tag) ? "is-active" : ""}`;
       pill.setAttribute("data-tag", tag);
       pill.innerHTML = `<span>${tag}</span><span class="tag-count">${count}</span>`;
 
@@ -606,6 +637,22 @@ function getFlagSvg(country) {
 
       this.dom.tagPillsContainer.appendChild(pill);
     });
+
+    // Schedule scroll button check after DOM paint
+    setTimeout(() => this.updatePillScrollButtons(), 50);
+  }
+
+  updatePillScrollButtons() {
+    if (!this.dom.tagPillsContainer) return;
+    const el = this.dom.tagPillsContainer;
+    const maxScroll = el.scrollWidth - el.clientWidth;
+
+    if (this.dom.tagPillsScrollLeft) {
+      this.dom.tagPillsScrollLeft.classList.toggle("is-hidden", el.scrollLeft <= 4);
+    }
+    if (this.dom.tagPillsScrollRight) {
+      this.dom.tagPillsScrollRight.classList.toggle("is-hidden", el.scrollLeft >= maxScroll - 4 || maxScroll <= 0);
+    }
   }
 
   updateRegionDropdown() {
