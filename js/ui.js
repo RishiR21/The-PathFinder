@@ -8,6 +8,7 @@ class TerrainUI {
     this.map = mapInstance;
     this.filter = filterInstance;
     this.activePark = null;
+    window.terrainUI = this;
 
     this.dom = {
       // Containers & Views

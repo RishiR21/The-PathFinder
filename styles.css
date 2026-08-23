@@ -1061,6 +1061,122 @@ a {
 }
 
 /* ==========================================================================
+   Leaflet Interactive Popup Styling
+   ========================================================================== */
+.leaflet-popup.custom-park-popup .leaflet-popup-content-wrapper {
+  background: rgba(10, 22, 16, 0.97) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  border-radius: var(--radius-md) !important;
+  padding: 0 !important;
+  color: var(--text-primary) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6) !important;
+  overflow: hidden;
+}
+
+.leaflet-popup.custom-park-popup .leaflet-popup-content {
+  margin: 0 !important;
+  width: 270px !important;
+  line-height: 1.4 !important;
+}
+
+.leaflet-popup.custom-park-popup .leaflet-popup-tip {
+  background: rgba(10, 22, 16, 0.97) !important;
+}
+
+.leaflet-container a.leaflet-popup-close-button {
+  top: 8px !important;
+  right: 8px !important;
+  color: #fff !important;
+  background: rgba(0, 0, 0, 0.6) !important;
+  border-radius: 50% !important;
+  width: 22px !important;
+  height: 22px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 14px !important;
+  z-index: 20 !important;
+}
+
+.map-popup-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.map-popup-img {
+  height: 110px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.map-popup-body {
+  padding: 10px 14px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.map-popup-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.map-popup-badge.national { color: #34d399; }
+.map-popup-badge.state { color: #fbbf24; }
+
+.map-popup-title {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+}
+
+.map-popup-loc {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.map-popup-desc {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin: 4px 0 8px 0;
+  line-height: 1.4;
+}
+
+.map-popup-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.map-popup-view-btn {
+  flex: 1;
+  background: #15803d;
+  color: #fff;
+  border: none;
+  padding: 7px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  text-align: center;
+}
+
+.map-popup-view-btn:hover {
+  background: #16a34a;
+  transform: translateY(-1px);
+}
+
+/* ==========================================================================
    Detail Drawer, Wishlist Drawer & Modals
    ========================================================================== */
 .terrain-drawer {

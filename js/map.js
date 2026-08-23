@@ -1,7 +1,15 @@
 /**
  * The Terrain - Leaflet Map Engine
- * Manages high-definition ArcGIS Topo Terrain basemaps, custom park markers, clustering, smooth pans, and hover tooltips.
+ * Manages high-definition ArcGIS Topo Terrain basemaps, custom park markers, clustering, smooth pans, hover tooltips, and interactive detail popups.
  */
+
+function getFlagSvg(country) {
+  if (country === "US") {
+    return `<svg class="country-flag-svg" viewBox="0 0 640 480" width="15" height="11" aria-label="USA" style="display:inline-block; border-radius:2px; vertical-align:middle; margin-right:4px; box-shadow:0 1px 3px rgba(0,0,0,0.3);"><g fill-rule="evenodd"><path fill="#bd3d44" d="M0 0h640v480H0z"/><path stroke="#fff" stroke-width="37" d="M0 55.5h640M0 129h640M0 203h640M0 277h640M0 351h640M0 424.5h640"/><path fill="#192f5d" d="M0 0h296v259H0z"/></g></svg>`;
+  } else {
+    return `<svg class="country-flag-svg" viewBox="0 0 640 480" width="15" height="11" aria-label="Canada" style="display:inline-block; border-radius:2px; vertical-align:middle; margin-right:4px; box-shadow:0 1px 3px rgba(0,0,0,0.3);"><g fill-rule="evenodd"><path fill="#f00" d="M0 0h640v480H0z"/><path fill="#fff" d="M160 0h320v480H160z"/><path fill="#f00" d="m320 80 18 54 50-20-16 48 54 8-36 38 40 38-54 8 10 50-48-26-18 62-18-62-48 26 10-50-54-8 40-38-36-38 54-8-16-48 50 20z"/></g></svg>`;
+  }
+}
 
 class TerrainMap {
   constructor(containerId = "map") {
@@ -11,6 +19,7 @@ class TerrainMap {
     this.markerMap = new Map();
     this.activeParkId = null;
     this.activePulseCircle = null;
+    this.justClickedMarker = false;
     this.listeners = [];
 
     // High-Definition Basemap tile layers
@@ -84,9 +93,10 @@ class TerrainMap {
 
     this.map.addLayer(this.clusterGroup);
 
-    // Click outside to deselect
+    // Map click on background only to deselect
     this.map.on("click", (e) => {
-      if (e.originalEvent.target.id === this.containerId || e.originalEvent.target.classList.contains("leaflet-container")) {
+      if (this.justClickedMarker) return;
+      if (e.originalEvent && (e.originalEvent.target.id === this.containerId || e.originalEvent.target.classList.contains("leaflet-container"))) {
         this.deselectPark();
       }
     });
@@ -157,14 +167,6 @@ class TerrainMap {
         title: park.name
       });
 
-function getFlagSvg(country) {
-  if (country === "US") {
-    return `<svg class="country-flag-svg" viewBox="0 0 640 480" width="15" height="11" aria-label="USA" style="display:inline-block; border-radius:2px; vertical-align:middle; margin-right:4px; box-shadow:0 1px 3px rgba(0,0,0,0.3);"><g fill-rule="evenodd"><path fill="#bd3d44" d="M0 0h640v480H0z"/><path stroke="#fff" stroke-width="37" d="M0 55.5h640M0 129h640M0 203h640M0 277h640M0 351h640M0 424.5h640"/><path fill="#192f5d" d="M0 0h296v259H0z"/></g></svg>`;
-  } else {
-    return `<svg class="country-flag-svg" viewBox="0 0 640 480" width="15" height="11" aria-label="Canada" style="display:inline-block; border-radius:2px; vertical-align:middle; margin-right:4px; box-shadow:0 1px 3px rgba(0,0,0,0.3);"><g fill-rule="evenodd"><path fill="#f00" d="M0 0h640v480H0z"/><path fill="#fff" d="M160 0h320v480H160z"/><path fill="#f00" d="m320 80 18 54 50-20-16 48 54 8-36 38 40 38-54 8 10 50-48-26-18 62-18-62-48 26 10-50-54-8 40-38-36-38 54-8-16-48 50 20z"/></g></svg>`;
-  }
-}
-
       const flag = getFlagSvg(park.country);
       const typeLabel = park.type === "national" ? "National Park" : "State / Provincial";
       const isVisited = window.storage ? window.storage.isVisited(park.id) : false;
@@ -174,7 +176,7 @@ function getFlagSvg(country) {
         ? `<div class="map-tooltip-visited">✓ Visited ${visitDetails?.date ? `(${visitDetails.date})` : ''}</div>`
         : "";
 
-      // Generous tooltip width with clean wrapping so park names never get cut off
+      // Generous tooltip on hover with clean wrapping
       const tooltipContent = `
         <div class="map-tooltip-content">
           <div class="map-tooltip-img" style="background-image: url('${park.heroImage}')"></div>
@@ -194,7 +196,39 @@ function getFlagSvg(country) {
         opacity: 1
       });
 
-      marker.on("click", () => {
+      // Interactive Popup on Click
+      const popupContent = `
+        <div class="map-popup-card" data-popup-park-id="${park.id}">
+          <div class="map-popup-img" style="background-image: url('${park.heroImage}')"></div>
+          <div class="map-popup-body">
+            <span class="map-popup-badge ${park.type}">${flag}<span>${typeLabel}</span></span>
+            <h4 class="map-popup-title">${park.name}</h4>
+            <p class="map-popup-loc">📍 ${park.stateProvince}, ${park.country === "US" ? "USA" : "Canada"}</p>
+            <p class="map-popup-desc">${park.description ? park.description.slice(0, 110) + '...' : ''}</p>
+            <div class="map-popup-actions">
+              <button class="map-popup-view-btn" onclick="window.terrainUI && window.terrainUI.openDrawer(window.PARKS_DATA.find(p => p.id === '${park.id}'))">
+                Explore Full Details ➔
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      marker.bindPopup(popupContent, {
+        offset: [0, -30],
+        className: "custom-park-popup",
+        maxWidth: 280,
+        autoPan: true,
+        autoPanPadding: [50, 50]
+      });
+
+      // Marker Click Event: Prevents bubbling, highlights, flies, and opens drawer
+      marker.on("click", (e) => {
+        if (e && e.originalEvent) {
+          L.DomEvent.stopPropagation(e.originalEvent);
+        }
+        this.justClickedMarker = true;
+        setTimeout(() => { this.justClickedMarker = false; }, 350);
         this.selectPark(park.id, true);
       });
 
@@ -223,6 +257,12 @@ function getFlagSvg(country) {
 
     // Add animated ripple pulse circle
     this.addPulseCircle(park.coordinates);
+
+    // Open marker popup
+    const marker = this.markerMap.get(parkId);
+    if (marker && !marker.isPopupOpen()) {
+      marker.openPopup();
+    }
 
     if (notifyListeners) {
       this.notify("park_selected", park);
