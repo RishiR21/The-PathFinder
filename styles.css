@@ -799,6 +799,17 @@ a {
   100% { transform: scale(1.4); opacity: 0; }
 }
 
+.active-park-pulse-layer {
+  animation: leafletPulseAnim 2s infinite ease-out;
+  pointer-events: none;
+}
+
+@keyframes leafletPulseAnim {
+  0% { opacity: 0.9; }
+  50% { opacity: 0.4; }
+  100% { opacity: 0; }
+}
+
 .terrain-cluster-wrapper {
   background: none;
   border: none;

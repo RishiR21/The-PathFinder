@@ -1,6 +1,6 @@
 /**
  * The Terrain - Leaflet Map Engine
- * Manages basemaps, custom park markers, clustering, smooth pans, and hover tooltips.
+ * Manages high-definition ArcGIS Topo Terrain basemaps, custom park markers, clustering, smooth pans, and hover tooltips.
  */
 
 class TerrainMap {
@@ -10,25 +10,33 @@ class TerrainMap {
     this.clusterGroup = null;
     this.markerMap = new Map();
     this.activeParkId = null;
+    this.activePulseCircle = null;
     this.listeners = [];
 
-    // Basemap tile layers
+    // High-Definition Basemap tile layers
     this.basemaps = {
-      terrain: L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", {
-        maxZoom: 17,
-        attribution: '&copy; <a href="https://opentopomap.org">OpenTopoMap</a>'
+      terrain: L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}", {
+        maxZoom: 18,
+        attribution: "Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, METI, TomTom"
       }),
       voyager: L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+        subdomains: "abcd",
         maxZoom: 19,
-        attribution: '&copy; <a href="https://carto.com/">CARTO</a>'
+        attribution: "&copy; CartoDB"
       }),
-      satellite: L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
-        maxZoom: 18,
-        attribution: '&copy; <a href="https://www.esri.com/">Esri</a>'
-      }),
+      satellite: L.layerGroup([
+        L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
+          maxZoom: 18,
+          attribution: "&copy; Esri"
+        }),
+        L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}", {
+          maxZoom: 18
+        })
+      ]),
       dark: L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+        subdomains: "abcd",
         maxZoom: 19,
-        attribution: '&copy; <a href="https://carto.com/">CARTO</a>'
+        attribution: "&copy; CartoDB"
       })
     };
 
@@ -39,7 +47,7 @@ class TerrainMap {
   initMap() {
     // Initial center on North America (US / Canada)
     this.map = L.map(this.containerId, {
-      center: [48.0, -100.0],
+      center: [44.5, -99.0],
       zoom: 4,
       minZoom: 3,
       maxZoom: 18,
@@ -63,8 +71,8 @@ class TerrainMap {
       iconCreateFunction: (cluster) => {
         const count = cluster.getChildCount();
         let sizeClass = "cluster-small";
-        if (count > 15) sizeClass = "cluster-large";
-        else if (count > 6) sizeClass = "cluster-medium";
+        if (count > 20) sizeClass = "cluster-large";
+        else if (count > 8) sizeClass = "cluster-medium";
 
         return L.divIcon({
           html: `<div class="terrain-cluster ${sizeClass}"><span>${count}</span></div>`,
@@ -199,14 +207,41 @@ class TerrainMap {
     this.highlightMarker(parkId);
 
     // Pan smoothly to marker
-    this.map.flyTo(park.coordinates, Math.max(this.map.getZoom(), 7), {
+    const targetZoom = Math.max(this.map.getZoom(), 8);
+    this.map.flyTo(park.coordinates, targetZoom, {
       duration: 1.2,
       easeLinearity: 0.25
     });
 
+    // Add animated ripple pulse circle
+    this.addPulseCircle(park.coordinates);
+
     if (notifyListeners) {
       this.notify("park_selected", park);
     }
+  }
+
+  addPulseCircle(coords) {
+    if (this.activePulseCircle) {
+      this.map.removeLayer(this.activePulseCircle);
+    }
+
+    this.activePulseCircle = L.circleMarker(coords, {
+      radius: 26,
+      className: "active-park-pulse-layer",
+      color: "#22c55e",
+      weight: 3,
+      fillColor: "#22c55e",
+      fillOpacity: 0.25
+    }).addTo(this.map);
+
+    // Fade out after 3 seconds
+    setTimeout(() => {
+      if (this.activePulseCircle) {
+        this.map.removeLayer(this.activePulseCircle);
+        this.activePulseCircle = null;
+      }
+    }, 3000);
   }
 
   deselectPark() {
@@ -214,6 +249,12 @@ class TerrainMap {
     const oldId = this.activeParkId;
     this.activeParkId = null;
     this.highlightMarker(null);
+
+    if (this.activePulseCircle) {
+      this.map.removeLayer(this.activePulseCircle);
+      this.activePulseCircle = null;
+    }
+
     this.notify("park_deselected", oldId);
   }
 
@@ -233,19 +274,21 @@ class TerrainMap {
   }
 
   fitBoundsToVisible() {
-    if (this.markerMap.size === 0) return;
-    const latLngs = [];
-    this.markerMap.forEach(marker => {
-      latLngs.push(marker.getLatLng());
-    });
-    if (latLngs.length > 0) {
-      const bounds = L.latLngBounds(latLngs);
-      this.map.fitBounds(bounds, { padding: [50, 50], maxZoom: 10 });
+    if (this.clusterGroup && this.clusterGroup.getLayers().length > 0) {
+      const bounds = this.clusterGroup.getBounds();
+      if (bounds.isValid()) {
+        this.map.fitBounds(bounds, {
+          padding: [50, 50],
+          maxZoom: 12,
+          animate: true,
+          duration: 1
+        });
+      }
     }
   }
 
   recenter() {
-    this.map.flyTo([48.0, -100.0], 4, { duration: 1 });
+    this.map.flyTo([44.5, -99.0], 4, { duration: 1 });
   }
 
   subscribe(callback) {
