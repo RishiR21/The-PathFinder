@@ -1,5 +1,5 @@
 /**
- * The Terrain - UI Controller
+ * PathFinder - UI Controller
  * Manages map views, sidebar cards, park detail drawer, wishlist, personal travel journey, and toasts.
  */
 
@@ -350,7 +350,7 @@ class TerrainUI {
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = "the_terrain_backup.json";
+        a.download = "pathfinder_journey_backup.json";
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -897,7 +897,7 @@ function getFlagSvg(country) {
     }
 
     const text = favParks.map((p, i) => `${i + 1}. ${p.name} (${p.stateProvince}, ${p.country}) - ${p.officialUrl}`).join("\n");
-    navigator.clipboard.writeText(`--- THE TERRAIN: PARK WISHLIST ---\n\n${text}`)
+    navigator.clipboard.writeText(`--- PATHFINDER: PARK WISHLIST ---\n\n${text}`)
       .then(() => this.showToast("Wishlist copied to clipboard!", "success"))
       .catch(() => this.showToast("Export ready.", "info"));
   }

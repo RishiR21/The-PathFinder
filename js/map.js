@@ -1,5 +1,5 @@
 /**
- * The Terrain - Leaflet Map Engine
+ * PathFinder - Leaflet Map Engine
  * Manages high-definition ArcGIS Topo Terrain basemaps, custom park markers, clustering, smooth pans, hover tooltips, and interactive detail popups.
  */
 

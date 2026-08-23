@@ -1,10 +1,10 @@
 /**
- * The Terrain - Application Bootstrap
+ * PathFinder - Application Bootstrap
  * Initializes storage, filter engine, map canvas, and UI controller.
  */
 
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("🌲 The Terrain — US & Canada Parks Explorer Initializing...");
+  console.log("🌲 PathFinder — US & Canada Parks Explorer Initializing...");
 
   // Validate dataset
   const data = window.PARKS_DATA || [];
@@ -22,5 +22,5 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initial trigger to render map markers and card list
   filterEngine.notify();
 
-  console.log("✨ The Terrain ready for exploration!");
+  console.log("✨ PathFinder ready for exploration!");
 });

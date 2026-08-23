@@ -1,6 +1,6 @@
-# The Terrain — Interactive US & Canada Parks Explorer
+# PathFinder — Interactive US & Canada Parks Explorer
 
-**The Terrain** (The-PathFinder) is a modern, responsive, and intuitive web application for exploring State and National Parks across the United States and Canada.
+**PathFinder** is a modern, responsive, and intuitive web application for exploring State and National Parks across the United States and Canada.
 
 Live interactive map featuring toggleable park modes, multi-criteria filtering, high-resolution photo profiles, GPS navigation, and personalized bucket lists.
 
