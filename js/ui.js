@@ -82,6 +82,12 @@ class TerrainUI {
       // About Modal
       aboutModal: document.getElementById("about-modal"),
       aboutModalCloseBtn: document.getElementById("about-modal-close-btn"),
+      creatorAvatarBtn: document.getElementById("creator-avatar-btn"),
+
+      // Photo Lightbox Modal
+      photoLightboxModal: document.getElementById("photo-lightbox-modal"),
+      photoLightboxCloseBtn: document.getElementById("photo-lightbox-close-btn"),
+      photoLightboxBackdrop: document.getElementById("photo-lightbox-backdrop"),
 
       // Toolbar Controls
       modeToggles: document.querySelectorAll("[data-mode-toggle]"),
@@ -369,6 +375,17 @@ class TerrainUI {
       this.dom.aboutModalCloseBtn.addEventListener("click", () => this.closeAboutModal());
     }
 
+    // Photo Lightbox Modal
+    if (this.dom.creatorAvatarBtn) {
+      this.dom.creatorAvatarBtn.addEventListener("click", () => this.openPhotoLightbox());
+    }
+    if (this.dom.photoLightboxCloseBtn) {
+      this.dom.photoLightboxCloseBtn.addEventListener("click", () => this.closePhotoLightbox());
+    }
+    if (this.dom.photoLightboxBackdrop) {
+      this.dom.photoLightboxBackdrop.addEventListener("click", () => this.closePhotoLightbox());
+    }
+
     // Global Keybindings
     window.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
@@ -377,6 +394,7 @@ class TerrainUI {
         this.closeJourneyModal();
         this.closeVisitModal();
         this.closeAboutModal();
+        this.closePhotoLightbox();
       }
       if (e.key === "/" && document.activeElement !== this.dom.searchInput && !document.activeElement.matches("input, textarea")) {
         e.preventDefault();
@@ -893,6 +911,15 @@ function getFlagSvg(country) {
   closeAboutModal() {
     this.dom.aboutModal?.classList.remove("is-open");
     this.dom.drawerOverlay?.classList.remove("is-open");
+  }
+
+  // --- Photo Lightbox Modal ---
+  openPhotoLightbox() {
+    this.dom.photoLightboxModal?.classList.add("is-open");
+  }
+
+  closePhotoLightbox() {
+    this.dom.photoLightboxModal?.classList.remove("is-open");
   }
 
   // Toast Notification System

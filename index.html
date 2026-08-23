@@ -400,9 +400,10 @@
         
         <!-- Chief Architect Card -->
         <div class="about-creator-card">
-          <div class="creator-avatar-wrap">
+          <button id="creator-avatar-btn" class="creator-avatar-wrap" title="Click to view full photo" aria-label="View full photo of Rishi Ramchandani">
             <img src="assets/images/rishi.png" alt="Rishi Ramchandani" class="creator-avatar-img" />
-          </div>
+            <div class="avatar-zoom-badge">🔍</div>
+          </button>
           <div class="creator-details">
             <h3 class="creator-full-name">Rishi Ramchandani</h3>
             <p class="creator-role-title">Creator &amp; Chief Architect</p>
@@ -464,6 +465,29 @@
           </div>
         </div>
 
+      </div>
+    </div>
+
+    <!-- FULL PHOTO LIGHTBOX MODAL -->
+    <div id="photo-lightbox-modal" class="photo-lightbox-modal" role="dialog" aria-modal="true" aria-label="Full Photo">
+      <div class="photo-lightbox-backdrop" id="photo-lightbox-backdrop"></div>
+      <div class="photo-lightbox-content">
+        <button id="photo-lightbox-close-btn" class="photo-lightbox-close" aria-label="Close photo">&times;</button>
+        <img src="assets/images/rishi.png" alt="Rishi Ramchandani - Twin Peaks Overlook" class="photo-lightbox-img" />
+        <div class="photo-lightbox-caption">
+          <div>
+            <h4>Rishi Ramchandani</h4>
+            <p>Creator &amp; Chief Architect &bull; The Terrain</p>
+          </div>
+          <div class="creator-social-row">
+            <a href="https://x.com/1RishiR" target="_blank" rel="noopener noreferrer" class="social-link-btn x-link" title="Follow Rishi on X">
+              <span>X (@1RishiR)</span>
+            </a>
+            <a href="https://www.linkedin.com/in/rishi-ramchandani-73a74916b/" target="_blank" rel="noopener noreferrer" class="social-link-btn linkedin-link" title="Connect on LinkedIn">
+              <span>LinkedIn</span>
+            </a>
+          </div>
+        </div>
       </div>
     </div>
 
