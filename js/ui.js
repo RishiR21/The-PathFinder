@@ -134,9 +134,20 @@ class TerrainUI {
   }
 
   initEventListeners() {
+    // Brand Logo Click - Smooth recenter and reset without tab navigation
+    if (this.dom.navBrandLogo) {
+      this.dom.navBrandLogo.addEventListener("click", (e) => {
+        e.preventDefault();
+        this.resetUIFilters();
+        this.map.recenter();
+        this.setMobileView("map");
+      });
+    }
+
     // Mode Switcher Buttons
     this.dom.modeToggles.forEach(btn => {
-      btn.addEventListener("click", () => {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
         const mode = btn.getAttribute("data-mode-toggle");
         this.filter.setMode(mode);
         this.dom.modeToggles.forEach(b => b.classList.toggle("is-active", b === btn));
@@ -619,7 +630,15 @@ function getFlagSvg(country) {
     if (this.dom.drawerBestSeason) this.dom.drawerBestSeason.textContent = park.bestSeason || "Year-round";
     if (this.dom.drawerClimate) this.dom.drawerClimate.textContent = park.climate || "Varies by season";
 
-    if (this.dom.drawerOfficialLink) this.dom.drawerOfficialLink.href = park.officialUrl || "#";
+    if (this.dom.drawerOfficialLink) {
+      if (park.officialUrl && park.officialUrl !== "#") {
+        this.dom.drawerOfficialLink.href = park.officialUrl;
+        this.dom.drawerOfficialLink.style.display = "inline-flex";
+      } else {
+        this.dom.drawerOfficialLink.removeAttribute("href");
+        this.dom.drawerOfficialLink.style.display = "none";
+      }
+    }
     if (this.dom.drawerDirectionsLink) {
       this.dom.drawerDirectionsLink.href = `https://www.google.com/maps/dir/?api=1&destination=${park.coordinates[0]},${park.coordinates[1]}`;
     }
