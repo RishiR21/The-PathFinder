@@ -23,79 +23,65 @@
 <body>
   <div id="app-container">
     
-    <!-- Top Header Navigation -->
+    <!-- Top Header Navigation (Minimal, Sleek & Responsive) -->
     <header class="terrain-header">
-      <div class="brand-section">
+      <div class="header-left-group">
         <a href="#" class="brand-logo" id="nav-brand-logo" title="The Terrain Home">
           <div class="logo-icon">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
               <path d="M14 6l-3.75 5L7 7l-5 8h20L14 6z"/>
             </svg>
           </div>
-          <div class="logo-text">
-            <span class="logo-title">THE TERRAIN</span>
-            <span class="logo-subtitle">US & Canada Parks Explorer</span>
-          </div>
+          <span class="logo-title">TERRAIN</span>
         </a>
 
-        <!-- Main View Switcher Tabs (Map Explorer vs Community & Profiles) -->
+        <!-- Main View Switcher -->
         <nav class="main-view-switcher" role="navigation" aria-label="Main Navigation">
           <button id="view-tab-map" class="view-switch-btn is-active" title="Explore Interactive Map">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-              <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
-              <line x1="8" y1="2" x2="8" y2="18"></line>
-              <line x1="16" y1="6" x2="16" y2="22"></line>
-            </svg>
-            <span>Map Explorer</span>
+            <span>🗺️ Map</span>
           </button>
           <button id="view-tab-community" class="view-switch-btn" title="View & Add Explorer Profiles">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-              <circle cx="9" cy="7" r="4"></circle>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-            </svg>
-            <span>Community & Profiles</span>
+            <span>👥 Community</span>
           </button>
         </nav>
       </div>
 
-      <!-- Center Controls: Mode Toggle & Country Filter & Search (Visible on Map View) -->
-      <div class="header-center" id="header-map-controls">
-        <!-- Park Mode Switcher (All / National / State) -->
-        <div class="mode-toggle-group" role="group" aria-label="Park Classification Toggle">
+      <!-- Center Controls: Mode Toggle & Search (Visible on Map View) -->
+      <div class="header-center-group" id="header-map-controls">
+        <!-- Park Mode Selector (All / National / State) -->
+        <div class="mode-toggle-group" role="group" aria-label="Park Classification">
           <button class="mode-btn is-active" data-mode-toggle="all" title="View All Parks">
-            <span>🌟 All Parks</span>
+            <span>🌟 All</span>
           </button>
           <button class="mode-btn" data-mode-toggle="national" title="View National Parks Only">
-            <span>🌲 National Parks</span>
+            <span>🌲 National</span>
           </button>
           <button class="mode-btn" data-mode-toggle="state" title="View State & Provincial Parks Only">
-            <span>🍂 State & Provincial</span>
+            <span>🍂 State/Prov</span>
           </button>
         </div>
 
-        <!-- Country Filter -->
-        <div class="country-toggle-group" role="group" aria-label="Country Filter">
+        <!-- Country Switcher -->
+        <div class="country-toggle-group" role="group" aria-label="Country">
           <button class="country-btn is-active" data-country-toggle="all" title="All Countries">All</button>
           <button class="country-btn" data-country-toggle="US" title="United States Parks">🇺🇸 US</button>
-          <button class="country-btn" data-country-toggle="CA" title="Canada Parks">🇨🇦 Canada</button>
+          <button class="country-btn" data-country-toggle="CA" title="Canada Parks">🇨🇦 CA</button>
         </div>
 
         <!-- Instant Search -->
         <div class="search-wrapper">
-          <svg class="search-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <svg class="search-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
-          <input type="text" id="search-input" class="search-input" placeholder="Search parks, states, trails... (Press '/')" aria-label="Search parks" autocomplete="off" />
+          <input type="text" id="search-input" class="search-input" placeholder="Search parks, states, trails... ('/')" aria-label="Search parks" autocomplete="off" />
           <button id="search-clear-btn" class="search-clear-btn" title="Clear search">✕</button>
         </div>
       </div>
 
-      <!-- Header Action Buttons & Explorer Profile -->
-      <div class="header-actions">
-        <!-- Explorer Passport & Level Button -->
+      <!-- Header Right Action Hub -->
+      <div class="header-right-group">
+        <!-- Explorer Profile & Passport Button -->
         <button id="passport-modal-btn" class="header-profile-btn" title="Open My Adventure Passport & Profile">
           <div class="profile-avatar-badge" id="header-avatar">🌲</div>
           <div class="profile-info-pill">
@@ -109,22 +95,22 @@
           </div>
         </button>
 
-        <button id="surprise-me-btn" class="header-action-btn" title="Discover a Random Park">
-          <span>🎲 Surprise Me</span>
-        </button>
-
-        <button id="wishlist-toggle-btn" class="header-action-btn" title="View Saved Bucket List">
-          <span>⭐ Wishlist</span>
+        <button id="wishlist-toggle-btn" class="header-icon-btn" title="View Saved Wishlist">
+          <span>⭐</span>
           <span id="wishlist-badge-count" class="badge-count" style="display: none;">0</span>
         </button>
 
-        <button id="stats-modal-btn" class="header-action-btn" title="View Park Insights & Preserved Land Stats">
-          <span>📊 Insights</span>
+        <button id="surprise-me-btn" class="header-icon-btn" title="Discover a Random Park">
+          <span>🎲</span>
+        </button>
+
+        <button id="stats-modal-btn" class="header-icon-btn" title="Conservation Insights & Stats">
+          <span>📊</span>
         </button>
       </div>
     </header>
 
-    <!-- Secondary Filter Toolbar (For Map View) -->
+    <!-- Secondary Filter Toolbar (Sleek, Single Row, No Cut-Offs) -->
     <div class="terrain-toolbar" id="terrain-map-toolbar">
       <div class="toolbar-left">
         <!-- Region / State / Province Dropdown -->
@@ -134,38 +120,38 @@
 
         <!-- Sort Select -->
         <select id="sort-select" class="toolbar-select" aria-label="Sort parks">
-          <option value="featured">✨ Featured Order</option>
-          <option value="name-asc">🔤 Name (A → Z)</option>
-          <option value="name-desc">🔤 Name (Z → A)</option>
-          <option value="established-asc">⏳ Oldest Established First</option>
-          <option value="established-desc">⏳ Newest Established First</option>
-          <option value="area-desc">📐 Largest Area First</option>
+          <option value="featured">✨ Featured</option>
+          <option value="name-asc">🔤 Name (A→Z)</option>
+          <option value="name-desc">🔤 Name (Z→A)</option>
+          <option value="established-asc">⏳ Oldest First</option>
+          <option value="established-desc">⏳ Newest First</option>
+          <option value="area-desc">📐 Largest Area</option>
           <option value="rating-desc">⭐ Highest Rated</option>
         </select>
 
         <!-- Visited-Only Quick Filter Pill -->
         <button id="filter-visited-toggle-btn" class="filter-tag-pill visited-filter-pill" title="Filter to show only parks you've stamped as visited">
-          <span>✓ Stamped in Passport</span>
+          <span>✓ Stamped</span>
           <span id="filter-visited-count" class="tag-count">0</span>
         </button>
 
         <!-- Basemap Style Selector -->
         <select id="basemap-select" class="toolbar-select" aria-label="Select Basemap Style">
-          <option value="terrain">🗺️ Outdoor Topo Terrain</option>
+          <option value="terrain">🗺️ Topo Terrain</option>
           <option value="voyager">🧭 Clean Explorer</option>
-          <option value="satellite">🛰️ Satellite Hybrid</option>
-          <option value="dark">🌌 Dark Night Sky</option>
+          <option value="satellite">🛰️ Satellite</option>
+          <option value="dark">🌌 Dark Night</option>
         </select>
       </div>
 
-      <!-- Quick Feature Tag Pills -->
+      <!-- Quick Feature Tag Pills (Scrollable with smooth fade) -->
       <div id="tag-pills-container" class="tag-pills-scroll" role="group" aria-label="Filter by Feature Tag">
         <!-- Populated dynamically by UI.js -->
       </div>
 
       <div class="toolbar-right">
-        <span id="results-counter" class="results-counter">Loading parks...</span>
-        <button id="reset-filters-btn" class="reset-filters-btn" title="Clear all active filters">Reset Filters</button>
+        <span id="results-counter" class="results-counter">112 Parks</span>
+        <button id="reset-filters-btn" class="reset-filters-btn" title="Reset all filters">✕ Reset</button>
       </div>
     </div>
 
@@ -181,7 +167,7 @@
         <div id="empty-state" class="empty-state">
           <div class="empty-state-icon">🏕️</div>
           <h3>No matching parks found</h3>
-          <p>Try adjusting your search criteria, switching modes, or resetting your filters.</p>
+          <p>Try adjusting your search criteria or resetting filters.</p>
         </div>
       </aside>
 
@@ -211,7 +197,7 @@
         <!-- Hero Header -->
         <div class="community-hero-banner">
           <div class="community-hero-content">
-            <span class="community-badge-tag">🌲 EXPLORER REGISTRY & COMMUNITY</span>
+            <span class="community-badge-tag">🌲 EXPLORER REGISTRY &amp; COMMUNITY</span>
             <h1 class="community-hero-title">Meet the Explorers Behind The Terrain</h1>
             <p class="community-hero-desc">
               Connect with passionate nature lovers, park rangers, and thru-hikers. Create your profile, share your social handles, and showcase your conquered wilderness.
@@ -231,7 +217,7 @@
         <div class="creator-showcase-section">
           <div class="creator-card">
             <div class="creator-header-banner">
-              <span class="creator-founder-badge">👑 APP FOUNDER & LEAD EXPLORER</span>
+              <span class="creator-founder-badge">👑 APP FOUNDER &amp; LEAD EXPLORER</span>
               <div class="creator-level-pill">Level 10 Summit Legend</div>
             </div>
 
@@ -239,7 +225,7 @@
               <div class="creator-avatar-wrap">👑</div>
               <div class="creator-main-info">
                 <h2 class="creator-name">Rishi Ramchandani</h2>
-                <p class="creator-title">Creator & Lead Architect &bull; 📍 Texas, USA</p>
+                <p class="creator-title">Creator &amp; Lead Architect &bull; 📍 Texas, USA</p>
                 <p class="creator-bio">
                   Creator of <strong>The Terrain</strong>. Dedicated to building immersive, interactive mapping tools that celebrate conservation and empower people to explore every corner of the United States and Canada's protected wilderness.
                 </p>
@@ -335,7 +321,7 @@
               </div>
 
               <div class="form-field">
-                <label for="comm-input-bio" class="form-label">Bio & Favorite Wilderness Memory</label>
+                <label for="comm-input-bio" class="form-label">Bio &amp; Favorite Wilderness Memory</label>
                 <textarea id="comm-input-bio" class="form-textarea" rows="3" placeholder="Tell other explorers about your favorite trails, camping stories, or bucket list goals..."></textarea>
               </div>
 
@@ -630,7 +616,7 @@
         </div>
 
         <div class="visit-form-group">
-          <label for="visit-notes-input" class="visit-form-label">Trip Memories & Journal Notes (+50 XP)</label>
+          <label for="visit-notes-input" class="visit-form-label">Trip Memories &amp; Journal Notes (+50 XP)</label>
           <textarea id="visit-notes-input" class="visit-textarea" rows="3" placeholder="Describe your favorite hike, wildlife encounter, weather, or camping story..."></textarea>
         </div>
 
@@ -645,7 +631,7 @@
     <!-- Stats & Insights Modal -->
     <div id="stats-modal" class="terrain-modal" role="dialog" aria-modal="true" aria-label="Preserved Land Stats">
       <div class="modal-header">
-        <h3 class="modal-title">📊 North America Parks & Conservation Insights</h3>
+        <h3 class="modal-title">📊 North America Parks &amp; Conservation Insights</h3>
         <button id="stats-modal-close-btn" class="drawer-close-btn" aria-label="Close stats">&times;</button>
       </div>
       <div class="modal-body">
