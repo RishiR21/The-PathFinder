@@ -428,7 +428,7 @@ class TerrainUI {
 
       card.innerHTML = `
         <div class="park-card-media">
-          <img src="${park.heroImage}" alt="${park.name}" loading="lazy" class="park-card-img" />
+          <img src="${park.heroImage}" alt="${park.name}" loading="lazy" class="park-card-img" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80';" />
           <button class="park-card-bookmark-btn ${isFav ? "is-active" : ""}" title="Save to Bucket List" data-fav-id="${park.id}">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="${isFav ? "#f59e0b" : "none"}" stroke="currentColor" stroke-width="2">
               <path d="M19 21l-7-5l-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
@@ -477,7 +477,12 @@ class TerrainUI {
     const flag = park.country === "US" ? "🇺🇸 United States" : "🇨🇦 Canada";
     const typeLabel = park.type === "national" ? "National Park" : "State / Provincial Park";
 
-    if (this.dom.drawerHeroImg) this.dom.drawerHeroImg.src = park.heroImage;
+    if (this.dom.drawerHeroImg) {
+      this.dom.drawerHeroImg.onerror = () => {
+        this.dom.drawerHeroImg.src = "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80";
+      };
+      this.dom.drawerHeroImg.src = park.heroImage;
+    }
     if (this.dom.drawerTitle) this.dom.drawerTitle.textContent = park.name;
     if (this.dom.drawerCountryBadge) this.dom.drawerCountryBadge.textContent = flag;
     if (this.dom.drawerTypeBadge) {
@@ -723,7 +728,7 @@ class TerrainUI {
       } else {
         this.dom.journeyParksList.innerHTML = stats.visitedParks.map(park => `
           <div class="journey-item-card" data-park-id="${park.id}">
-            <img src="${park.heroImage}" alt="${park.name}" class="journey-item-img" />
+            <img src="${park.heroImage}" alt="${park.name}" class="journey-item-img" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80';" />
             <div class="journey-item-info">
               <div class="journey-item-top">
                 <h4 class="journey-item-title">${park.name}</h4>
@@ -777,7 +782,7 @@ class TerrainUI {
 
     this.dom.wishlistList.innerHTML = favParks.map(park => `
       <div class="wishlist-item" data-wishlist-id="${park.id}">
-        <img src="${park.heroImage}" alt="${park.name}" class="wishlist-item-img" />
+        <img src="${park.heroImage}" alt="${park.name}" class="wishlist-item-img" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80';" />
         <div class="wishlist-item-info">
           <h4 class="wishlist-item-title">${park.name}</h4>
           <p class="wishlist-item-sub">${park.country === "US" ? "🇺🇸" : "🇨🇦"} ${park.stateProvince} &bull; ${park.type === "national" ? "National" : "State"}</p>
