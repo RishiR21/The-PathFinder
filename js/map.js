@@ -157,7 +157,15 @@ class TerrainMap {
         title: park.name
       });
 
-      const flag = park.country === "US" ? "🇺🇸" : "🇨🇦";
+function getFlagSvg(country) {
+  if (country === "US") {
+    return `<svg class="country-flag-svg" viewBox="0 0 640 480" width="15" height="11" aria-label="USA" style="display:inline-block; border-radius:2px; vertical-align:middle; margin-right:4px; box-shadow:0 1px 3px rgba(0,0,0,0.3);"><g fill-rule="evenodd"><path fill="#bd3d44" d="M0 0h640v480H0z"/><path stroke="#fff" stroke-width="37" d="M0 55.5h640M0 129h640M0 203h640M0 277h640M0 351h640M0 424.5h640"/><path fill="#192f5d" d="M0 0h296v259H0z"/></g></svg>`;
+  } else {
+    return `<svg class="country-flag-svg" viewBox="0 0 640 480" width="15" height="11" aria-label="Canada" style="display:inline-block; border-radius:2px; vertical-align:middle; margin-right:4px; box-shadow:0 1px 3px rgba(0,0,0,0.3);"><g fill-rule="evenodd"><path fill="#f00" d="M0 0h640v480H0z"/><path fill="#fff" d="M160 0h320v480H160z"/><path fill="#f00" d="m320 80 18 54 50-20-16 48 54 8-36 38 40 38-54 8 10 50-48-26-18 62-18-62-48 26 10-50-54-8 40-38-36-38 54-8-16-48 50 20z"/></g></svg>`;
+  }
+}
+
+      const flag = getFlagSvg(park.country);
       const typeLabel = park.type === "national" ? "National Park" : "State / Provincial";
       const isVisited = window.storage ? window.storage.isVisited(park.id) : false;
       const visitDetails = isVisited ? window.storage.getVisitDetails(park.id) : null;
@@ -171,7 +179,7 @@ class TerrainMap {
         <div class="map-tooltip-content">
           <div class="map-tooltip-img" style="background-image: url('${park.heroImage}')"></div>
           <div class="map-tooltip-body">
-            <span class="map-tooltip-badge ${park.type}">${flag} ${typeLabel}</span>
+            <span class="map-tooltip-badge ${park.type}">${flag}<span>${typeLabel}</span></span>
             <h4 class="map-tooltip-title">${park.name}</h4>
             <p class="map-tooltip-loc">📍 ${park.stateProvince}</p>
             ${visitedStatusHtml}

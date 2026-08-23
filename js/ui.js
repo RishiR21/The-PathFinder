@@ -414,6 +414,14 @@ class TerrainUI {
 
     if (this.dom.emptyState) this.dom.emptyState.style.display = "none";
 
+function getFlagSvg(country) {
+  if (country === "US") {
+    return `<svg class="country-flag-svg" viewBox="0 0 640 480" width="14" height="10" aria-label="USA" style="display:inline-block; border-radius:2px; vertical-align:middle; margin-right:4px; box-shadow:0 1px 3px rgba(0,0,0,0.3);"><g fill-rule="evenodd"><path fill="#bd3d44" d="M0 0h640v480H0z"/><path stroke="#fff" stroke-width="37" d="M0 55.5h640M0 129h640M0 203h640M0 277h640M0 351h640M0 424.5h640"/><path fill="#192f5d" d="M0 0h296v259H0z"/></g></svg>`;
+  } else {
+    return `<svg class="country-flag-svg" viewBox="0 0 640 480" width="14" height="10" aria-label="Canada" style="display:inline-block; border-radius:2px; vertical-align:middle; margin-right:4px; box-shadow:0 1px 3px rgba(0,0,0,0.3);"><g fill-rule="evenodd"><path fill="#f00" d="M0 0h640v480H0z"/><path fill="#fff" d="M160 0h320v480H160z"/><path fill="#f00" d="m320 80 18 54 50-20-16 48 54 8-36 38 40 38-54 8 10 50-48-26-18 62-18-62-48 26 10-50-54-8 40-38-36-38 54-8-16-48 50 20z"/></g></svg>`;
+  }
+}
+
     parks.forEach(park => {
       const card = document.createElement("div");
       card.className = `park-card ${park.id === (this.activePark?.id) ? "is-active" : ""}`;
@@ -422,7 +430,7 @@ class TerrainUI {
       const isFav = window.storage.isFavorite(park.id);
       const isVisited = window.storage.isVisited(park.id);
       const visitData = isVisited ? window.storage.getVisitDetails(park.id) : null;
-      const flag = park.country === "US" ? "🇺🇸" : "🇨🇦";
+      const flag = getFlagSvg(park.country);
       const typeLabel = park.type === "national" ? "National Park" : "State / Provincial";
       const badgeClass = park.type === "national" ? "badge-national" : "badge-state";
 
@@ -438,7 +446,7 @@ class TerrainUI {
         </div>
         <div class="park-card-content">
           <div class="park-card-header">
-            <span class="park-type-badge ${badgeClass}">${flag} ${typeLabel}</span>
+            <span class="park-type-badge ${badgeClass}">${flag}<span>${typeLabel}</span></span>
             <span class="park-rating">★ ${park.rating || "4.9"}</span>
           </div>
           <h3 class="park-card-title">${park.name}</h3>
@@ -474,7 +482,8 @@ class TerrainUI {
 
   openDrawer(park) {
     this.activePark = park;
-    const flag = park.country === "US" ? "🇺🇸 United States" : "🇨🇦 Canada";
+    const flag = getFlagSvg(park.country);
+    const countryName = park.country === "US" ? "United States" : "Canada";
     const typeLabel = park.type === "national" ? "National Park" : "State / Provincial Park";
 
     if (this.dom.drawerHeroImg) {
@@ -484,7 +493,7 @@ class TerrainUI {
       this.dom.drawerHeroImg.src = park.heroImage;
     }
     if (this.dom.drawerTitle) this.dom.drawerTitle.textContent = park.name;
-    if (this.dom.drawerCountryBadge) this.dom.drawerCountryBadge.textContent = flag;
+    if (this.dom.drawerCountryBadge) this.dom.drawerCountryBadge.innerHTML = `${flag} <span>${countryName}</span>`;
     if (this.dom.drawerTypeBadge) {
       this.dom.drawerTypeBadge.textContent = typeLabel;
       this.dom.drawerTypeBadge.className = `drawer-badge ${park.type === "national" ? "badge-national" : "badge-state"}`;
@@ -734,7 +743,7 @@ class TerrainUI {
                 <h4 class="journey-item-title">${park.name}</h4>
                 <span class="journey-item-date">${park.visitData?.date || ''}</span>
               </div>
-              <p class="journey-item-loc">📍 ${park.stateProvince}, ${park.country === 'US' ? 'USA' : 'Canada'} &bull; ${park.type === 'national' ? 'National Park' : 'State Park'}</p>
+              <p class="journey-item-loc">📍 ${park.stateProvince}, ${getFlagSvg(park.country)} ${park.country === 'US' ? 'USA' : 'Canada'} &bull; ${park.type === 'national' ? 'National Park' : 'State Park'}</p>
               ${park.visitData?.notes ? `<p class="journey-item-notes">"${park.visitData.notes}"</p>` : ''}
             </div>
             <button class="wishlist-item-view-btn" data-action="view" data-id="${park.id}" title="View on Map">🗺️</button>
@@ -785,7 +794,7 @@ class TerrainUI {
         <img src="${park.heroImage}" alt="${park.name}" class="wishlist-item-img" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80';" />
         <div class="wishlist-item-info">
           <h4 class="wishlist-item-title">${park.name}</h4>
-          <p class="wishlist-item-sub">${park.country === "US" ? "🇺🇸" : "🇨🇦"} ${park.stateProvince} &bull; ${park.type === "national" ? "National" : "State"}</p>
+          <p class="wishlist-item-sub">${getFlagSvg(park.country)} ${park.stateProvince} &bull; ${park.type === "national" ? "National" : "State"}</p>
         </div>
         <div class="wishlist-item-actions">
           <button class="wishlist-item-view-btn" title="View on Map" data-action="view" data-id="${park.id}">🗺️</button>
