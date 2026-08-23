@@ -1,6 +1,6 @@
 /**
  * The Terrain - Adventure Passport & Gamification Engine
- * Calculates Explorer Level, XP, achievements, travel statistics, and generates vintage digital cancellation stamps.
+ * Streamlined Explorer Level, XP, 6 Core Achievements, travel statistics, and vintage cancellation stamps.
  */
 
 const RANKS = [
@@ -16,11 +16,12 @@ const RANKS = [
   { level: 10, title: "Summit Legend", minXp: 6300, maxXp: Infinity, icon: "👑" }
 ];
 
+// 6 Curated High-Impact Core Badges for a clean, seamless, no-scroll interface
 const ACHIEVEMENTS_DEF = [
   {
     id: "first_step",
     title: "First Footprint",
-    desc: "Log your first park visit in your Adventure Passport.",
+    desc: "Log your first park visit.",
     icon: "👣",
     xp: 200,
     check: (visitedParks) => visitedParks.length >= 1,
@@ -29,55 +30,19 @@ const ACHIEVEMENTS_DEF = [
   {
     id: "alpine_monarch",
     title: "Alpine Monarch",
-    desc: "Visit 3 mountain parks.",
+    desc: "Visit 2 mountain parks.",
     icon: "🏔️",
     xp: 300,
-    check: (visitedParks) => visitedParks.filter(p => (p.tags || []).some(t => t.toLowerCase().includes("mountain"))).length >= 3,
+    check: (visitedParks) => visitedParks.filter(p => (p.tags || []).some(t => t.toLowerCase().includes("mountain"))).length >= 2,
     progress: (visitedParks) => {
       const count = visitedParks.filter(p => (p.tags || []).some(t => t.toLowerCase().includes("mountain"))).length;
-      return { current: Math.min(count, 3), target: 3 };
-    }
-  },
-  {
-    id: "ring_of_fire",
-    title: "Ring of Fire",
-    desc: "Visit 2 active or dormant volcanic parks.",
-    icon: "🌋",
-    xp: 300,
-    check: (visitedParks) => visitedParks.filter(p => (p.tags || []).some(t => t.toLowerCase().includes("volcan"))).length >= 2,
-    progress: (visitedParks) => {
-      const count = visitedParks.filter(p => (p.tags || []).some(t => t.toLowerCase().includes("volcan"))).length;
-      return { current: Math.min(count, 2), target: 2 };
-    }
-  },
-  {
-    id: "canyon_nomad",
-    title: "Canyon Nomad",
-    desc: "Visit 2 canyon or gorge parks.",
-    icon: "🏜️",
-    xp: 300,
-    check: (visitedParks) => visitedParks.filter(p => (p.tags || []).some(t => t.toLowerCase().includes("canyon") || t.toLowerCase().includes("gorge"))).length >= 2,
-    progress: (visitedParks) => {
-      const count = visitedParks.filter(p => (p.tags || []).some(t => t.toLowerCase().includes("canyon") || t.toLowerCase().includes("gorge"))).length;
-      return { current: Math.min(count, 2), target: 2 };
-    }
-  },
-  {
-    id: "glacier_pioneer",
-    title: "Glacial Pioneer",
-    desc: "Visit 2 glaciated wilderness parks.",
-    icon: "❄️",
-    xp: 300,
-    check: (visitedParks) => visitedParks.filter(p => (p.tags || []).some(t => t.toLowerCase().includes("glacier"))).length >= 2,
-    progress: (visitedParks) => {
-      const count = visitedParks.filter(p => (p.tags || []).some(t => t.toLowerCase().includes("glacier"))).length;
       return { current: Math.min(count, 2), target: 2 };
     }
   },
   {
     id: "ancient_giants",
     title: "Old Growth Guardian",
-    desc: "Visit Redwood or Sequoia National Parks.",
+    desc: "Visit Redwood or Sequoia.",
     icon: "🌲",
     xp: 350,
     check: (visitedParks) => visitedParks.some(p => p.id === "us-np-redwood" || p.id === "us-np-sequoia" || p.id === "us-np-kings-canyon"),
@@ -89,71 +54,35 @@ const ACHIEVEMENTS_DEF = [
   {
     id: "true_north",
     title: "True North Explorer",
-    desc: "Visit 3 Canadian National or Provincial parks.",
+    desc: "Visit 2 Canadian parks.",
     icon: "🇨🇦",
     xp: 300,
-    check: (visitedParks) => visitedParks.filter(p => p.country === "CA").length >= 3,
+    check: (visitedParks) => visitedParks.filter(p => p.country === "CA").length >= 2,
     progress: (visitedParks) => {
       const count = visitedParks.filter(p => p.country === "CA").length;
-      return { current: Math.min(count, 3), target: 3 };
+      return { current: Math.min(count, 2), target: 2 };
     }
   },
   {
     id: "stars_align",
-    title: "Midnight Stargazer",
-    desc: "Visit 2 designated Dark Sky parks.",
+    title: "Dark Sky Stargazer",
+    desc: "Visit a designated Dark Sky park.",
     icon: "🌌",
     xp: 300,
-    check: (visitedParks) => visitedParks.filter(p => (p.tags || []).some(t => t.toLowerCase().includes("dark sky") || t.toLowerCase().includes("stargazing"))).length >= 2,
+    check: (visitedParks) => visitedParks.some(p => (p.tags || []).some(t => t.toLowerCase().includes("dark sky") || t.toLowerCase().includes("stargazing"))),
     progress: (visitedParks) => {
       const count = visitedParks.filter(p => (p.tags || []).some(t => t.toLowerCase().includes("dark sky") || t.toLowerCase().includes("stargazing"))).length;
-      return { current: Math.min(count, 2), target: 2 };
-    }
-  },
-  {
-    id: "bison_trail",
-    title: "Bison Trail",
-    desc: "Visit 2 parks with free-roaming bison herds.",
-    icon: "🦬",
-    xp: 300,
-    check: (visitedParks) => visitedParks.filter(p => (p.tags || []).some(t => t.toLowerCase().includes("bison"))).length >= 2,
-    progress: (visitedParks) => {
-      const count = visitedParks.filter(p => (p.tags || []).some(t => t.toLowerCase().includes("bison"))).length;
-      return { current: Math.min(count, 2), target: 2 };
-    }
-  },
-  {
-    id: "deep_earth",
-    title: "Subterranean Master",
-    desc: "Visit a cave or cavern national park.",
-    icon: "🕳️",
-    xp: 250,
-    check: (visitedParks) => visitedParks.some(p => (p.tags || []).some(t => t.toLowerCase().includes("cave"))),
-    progress: (visitedParks) => {
-      const count = visitedParks.filter(p => (p.tags || []).some(t => t.toLowerCase().includes("cave"))).length;
       return { current: Math.min(count, 1), target: 1 };
     }
   },
   {
-    id: "coastal_cruiser",
-    title: "Coastline Cruiser",
-    desc: "Visit 3 coastal or ocean shoreline parks.",
-    icon: "🌊",
-    xp: 300,
-    check: (visitedParks) => visitedParks.filter(p => (p.tags || []).some(t => t.toLowerCase().includes("coast") || t.toLowerCase().includes("beach"))).length >= 3,
-    progress: (visitedParks) => {
-      const count = visitedParks.filter(p => (p.tags || []).some(t => t.toLowerCase().includes("coast") || t.toLowerCase().includes("beach"))).length;
-      return { current: Math.min(count, 3), target: 3 };
-    }
-  },
-  {
     id: "master_explorer",
-    title: "Master of the Terrain",
-    desc: "Log 10 total parks in your Passport.",
-    icon: "⭐",
-    xp: 600,
-    check: (visitedParks) => visitedParks.length >= 10,
-    progress: (visitedParks) => ({ current: Math.min(visitedParks.length, 10), target: 10 })
+    title: "Summit Legend",
+    desc: "Log 5 total parks in your Passport.",
+    icon: "👑",
+    xp: 500,
+    check: (visitedParks) => visitedParks.length >= 5,
+    progress: (visitedParks) => ({ current: Math.min(visitedParks.length, 5), target: 5 })
   }
 ];
 
@@ -233,13 +162,11 @@ class PassportEngine {
     };
   }
 
-  // Retrieve list of unlocked achievements
   getUnlockedAchievements(visitedParks) {
     const parks = visitedParks || this.getVisitedParkObjects();
     return ACHIEVEMENTS_DEF.filter(ach => ach.check(parks));
   }
 
-  // Retrieve all achievements with status and progress
   getAllAchievementsStatus() {
     const visitedParks = this.getVisitedParkObjects();
     return ACHIEVEMENTS_DEF.map(ach => {
@@ -253,7 +180,6 @@ class PassportEngine {
     });
   }
 
-  // Calculate detailed travel statistics
   getTravelStats() {
     const visitedParks = this.getVisitedParkObjects();
     const allParks = window.PARKS_DATA || [];
@@ -261,11 +187,8 @@ class PassportEngine {
     const totalVisited = visitedParks.length;
     const totalParks = allParks.length;
     const completionPercent = totalParks > 0 ? ((totalVisited / totalParks) * 100).toFixed(1) : 0;
-
-    // Preserved Acreage Explored
     const totalAcreage = visitedParks.reduce((sum, p) => sum + (p.areaAcres || 0), 0);
 
-    // States and Provinces Breakdown
     const visitedUSStates = new Set();
     const visitedCAProvinces = new Set();
 
@@ -306,32 +229,28 @@ class PassportEngine {
 
     return `
       <div class="passport-stamp-wrap" title="${park.name} - Stamped on ${dateStr}">
-        <svg viewBox="0 0 160 160" width="130" height="130" class="vintage-cancellation-stamp">
+        <svg viewBox="0 0 160 160" width="110" height="110" class="vintage-cancellation-stamp">
           <circle cx="80" cy="80" r="74" fill="none" stroke="${inkColor}" stroke-width="2.5" stroke-dasharray="3, 1" />
           <circle cx="80" cy="80" r="68" fill="none" stroke="${inkColor}" stroke-width="1.5" />
           <circle cx="80" cy="80" r="54" fill="none" stroke="${inkColor}" stroke-width="0.8" stroke-dasharray="2, 2" />
 
-          <!-- Circular Arc Paths -->
           <path id="stamp-top-arc-${park.id}" d="M 28,80 A 52,52 0 0,1 132,80" fill="none" />
           <path id="stamp-bot-arc-${park.id}" d="M 132,80 A 52,52 0 0,1 28,80" fill="none" />
 
-          <!-- Top Arc Text -->
-          <text font-size="7.5" font-weight="bold" fill="${inkColor}" letter-spacing="1">
+          <text font-size="7" font-weight="bold" fill="${inkColor}" letter-spacing="0.8">
             <textPath href="#stamp-top-arc-${park.id}" startOffset="50%" text-anchor="middle">
               ${isNational ? "NATIONAL PARK SERVICE" : "STATE & PROV PARKS"}
             </textPath>
           </text>
 
-          <!-- Middle Center: Date & Park Name -->
           <g transform="translate(80, 72)" text-anchor="middle">
-            <text y="-2" font-size="8.5" font-weight="900" fill="${inkColor}" letter-spacing="0.5">${parkNameClean}</text>
-            <line x1="-34" y1="4" x2="34" y2="4" stroke="${inkColor}" stroke-width="1" />
-            <text y="14" font-size="8" font-weight="800" fill="${inkColor}" letter-spacing="0.8">${dateStr}</text>
-            <line x1="-34" y1="18" x2="34" y2="18" stroke="${inkColor}" stroke-width="1" />
+            <text y="-2" font-size="8" font-weight="900" fill="${inkColor}" letter-spacing="0.5">${parkNameClean}</text>
+            <line x1="-30" y1="3" x2="30" y2="3" stroke="${inkColor}" stroke-width="0.9" />
+            <text y="13" font-size="7.5" font-weight="800" fill="${inkColor}" letter-spacing="0.8">${dateStr}</text>
+            <line x1="-30" y1="17" x2="30" y2="17" stroke="${inkColor}" stroke-width="0.9" />
           </g>
 
-          <!-- Bottom Arc Text -->
-          <text font-size="7" font-weight="bold" fill="${inkColor}" letter-spacing="1">
+          <text font-size="6.5" font-weight="bold" fill="${inkColor}" letter-spacing="0.8">
             <textPath href="#stamp-bot-arc-${park.id}" startOffset="50%" text-anchor="middle">
               ★ ${locStr} ★
             </textPath>

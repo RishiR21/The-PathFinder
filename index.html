@@ -55,7 +55,7 @@
               <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
               <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
             </svg>
-            <span>Community & Explorers</span>
+            <span>Community & Profiles</span>
           </button>
         </nav>
       </div>
@@ -482,158 +482,122 @@
       </div>
     </div>
 
-    <!-- Interactive Explorer Passport & Profiles Modal -->
-    <div id="passport-modal" class="terrain-modal passport-modal-size" role="dialog" aria-modal="true" aria-label="Adventure Passport">
-      <div class="modal-header">
+    <!-- CLEAN, STREAMLINED & NO-SCROLL ADVENTURE PASSPORT MODAL -->
+    <div id="passport-modal" class="terrain-modal clean-passport-modal" role="dialog" aria-modal="true" aria-label="Adventure Passport">
+      <div class="modal-header compact-modal-header">
         <div class="passport-header-title-group">
           <span class="passport-gold-icon">📔</span>
           <div>
-            <h3 class="modal-title">National & State Parks Adventure Passport</h3>
-            <p class="modal-subtitle">Track your travels, collect vintage cancellation stamps, and unlock achievements</p>
+            <h3 class="modal-title">Adventure Passport &amp; Explorer Profile</h3>
           </div>
         </div>
         <button id="passport-modal-close-btn" class="drawer-close-btn" aria-label="Close passport">&times;</button>
       </div>
 
-      <!-- Passport Tabs Navigation -->
-      <div class="passport-tab-nav" role="tablist">
+      <!-- Compact Clean Tabs Navigation -->
+      <div class="passport-tab-nav compact-tab-nav" role="tablist">
         <button class="passport-tab-btn is-active" data-tab="stamps">
-          <span>🏷️ Passport Stamps</span>
+          <span>🏷️ Stamp Book</span>
         </button>
         <button class="passport-tab-btn" data-tab="achievements">
-          <span>🏆 Achievements & Badges</span>
-        </button>
-        <button class="passport-tab-btn" data-tab="stats">
-          <span>🗺️ Travel Territory</span>
+          <span>🏆 Badges (6)</span>
         </button>
         <button class="passport-tab-btn" data-tab="profile">
-          <span>👤 Explorer Profile</span>
+          <span>👤 Profile &amp; Sync</span>
         </button>
       </div>
 
-      <div class="modal-body passport-modal-body">
+      <div class="modal-body compact-passport-body">
         
         <!-- Tab 1: Passport Stamp Book -->
         <div id="passport-tab-stamps" class="passport-tab-panel is-active">
-          <div class="stamps-overview-bar">
-            <div class="stamp-bar-stat">
-              <span class="stamp-bar-num" id="stamps-count-total">0</span>
-              <span class="stamp-bar-lbl">Parks Stamped</span>
+          <div class="stamps-mini-stats-bar">
+            <div class="mini-stat-chip">
+              <span class="mini-chip-val" id="stamps-count-total">0</span>
+              <span class="mini-chip-lbl">Parks Stamped</span>
             </div>
-            <div class="stamp-bar-stat">
-              <span class="stamp-bar-num" id="stamps-acres-total">0</span>
-              <span class="stamp-bar-lbl">Acres Explored</span>
+            <div class="mini-stat-chip">
+              <span class="mini-chip-val" id="stamps-acres-total">0M</span>
+              <span class="mini-chip-lbl">Acres Conquered</span>
             </div>
-            <div class="stamp-bar-stat">
-              <span class="stamp-bar-num" id="stamps-xp-total">0 XP</span>
-              <span class="stamp-bar-lbl">Explorer Experience</span>
+            <div class="mini-stat-chip">
+              <span class="mini-chip-val" id="stamps-xp-total">0 XP</span>
+              <span class="mini-chip-lbl">Total Experience</span>
             </div>
           </div>
 
-          <div id="passport-stamps-grid" class="passport-stamps-grid">
+          <div id="passport-stamps-grid" class="clean-stamps-grid">
             <!-- Vintage stamps injected dynamically -->
           </div>
         </div>
 
-        <!-- Tab 2: Achievements & Badges -->
+        <!-- Tab 2: Curated 6 Core Badges -->
         <div id="passport-tab-achievements" class="passport-tab-panel">
-          <div class="achievements-summary-banner">
-            <div>
-              <h4 id="achievements-unlocked-title">Unlocked 0 / 12 Badges</h4>
-              <p>Explore different biomes, active volcanoes, and Canadian wilderness to unlock exclusive explorer badges.</p>
-            </div>
-          </div>
-          <div id="achievements-grid" class="achievements-grid">
-            <!-- Badges injected dynamically -->
+          <div id="achievements-grid" class="clean-achievements-grid">
+            <!-- 6 streamlined badges injected dynamically -->
           </div>
         </div>
 
-        <!-- Tab 3: Travel Territory & Conquered Map -->
-        <div id="passport-tab-stats" class="passport-tab-panel">
-          <div class="territory-stats-grid">
-            <div class="territory-card">
-              <span class="territory-num" id="territory-us-states">0 / 50</span>
-              <span class="territory-lbl">🇺🇸 US States Conquered</span>
-              <div id="territory-us-tags" class="territory-tags-cloud"></div>
-            </div>
-            <div class="territory-card">
-              <span class="territory-num" id="territory-ca-provinces">0 / 13</span>
-              <span class="territory-lbl">🇨🇦 Canadian Provinces & Territories</span>
-              <div id="territory-ca-tags" class="territory-tags-cloud"></div>
-            </div>
-          </div>
-
-          <div class="territory-progress-section">
-            <h4 class="drawer-section-title">Park System Completion</h4>
-            <div class="system-progress-item">
-              <div class="progress-info-row">
-                <span>🇺🇸 US National Parks</span>
-                <span id="prog-us-np">0 / 63 (0%)</span>
-              </div>
-              <div class="progress-bar-track">
-                <div id="bar-us-np" class="progress-bar-fill" style="width: 0%;"></div>
-              </div>
-            </div>
-
-            <div class="system-progress-item">
-              <div class="progress-info-row">
-                <span>🇨🇦 Parks Canada</span>
-                <span id="prog-ca-np">0 / 48 (0%)</span>
-              </div>
-              <div class="progress-bar-track">
-                <div id="bar-ca-np" class="progress-bar-fill" style="width: 0%;"></div>
-              </div>
-            </div>
-
-            <div class="system-progress-item">
-              <div class="progress-info-row">
-                <span>🍂 State & Provincial Parks</span>
-                <span id="prog-sp">0 Logged</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Tab 4: Explorer Profile Switcher & Settings -->
+        <!-- Tab 3: Explorer Profile & Cross-Instance Sync -->
         <div id="passport-tab-profile" class="passport-tab-panel">
-          <div class="profile-card-large">
-            <div class="large-avatar-wrap" id="profile-avatar-display">🌲</div>
-            <div class="large-profile-info">
-              <div class="profile-header-edit">
-                <input type="text" id="profile-name-input" class="profile-name-input" value="Trail Explorer" />
-                <span id="profile-rank-display" class="rank-title-badge">Trail Scout (Lvl 1)</span>
-              </div>
-              <p class="profile-joined-date" id="profile-joined-date">Explorer since August 2026</p>
-              
-              <div class="avatar-picker-row">
-                <span class="avatar-picker-label">Choose Avatar:</span>
-                <div class="avatar-options">
-                  <button class="avatar-opt-btn" data-avatar="🌲">🌲</button>
-                  <button class="avatar-opt-btn" data-avatar="🏔️">🏔️</button>
-                  <button class="avatar-opt-btn" data-avatar="🦬">🦬</button>
-                  <button class="avatar-opt-btn" data-avatar="🧭">🧭</button>
-                  <button class="avatar-opt-btn" data-avatar="🐻">🐻</button>
-                  <button class="avatar-opt-btn" data-avatar="🦅">🦅</button>
-                  <button class="avatar-opt-btn" data-avatar="🐺">🐺</button>
-                  <button class="avatar-opt-btn" data-avatar="🛶">🛶</button>
-                  <button class="avatar-opt-btn" data-avatar="⛺">⛺</button>
-                  <button class="avatar-opt-btn" data-avatar="🌟">🌟</button>
+          <div class="clean-profile-grid">
+            
+            <!-- Left: Profile Editor -->
+            <div class="clean-profile-edit-box">
+              <div class="clean-profile-avatar-row">
+                <div class="clean-avatar-circle" id="profile-avatar-display">🌲</div>
+                <div class="clean-profile-name-group">
+                  <input type="text" id="profile-name-input" class="clean-name-input" value="Trail Explorer" placeholder="Explorer Name" />
+                  <span id="profile-rank-display" class="rank-title-badge">Trail Scout (Lvl 1)</span>
                 </div>
               </div>
-            </div>
-          </div>
 
-          <!-- Switch Explorer Profiles -->
-          <div class="profile-switcher-section">
-            <h4 class="drawer-section-title">Switch or Create Explorer Persona</h4>
-            <div id="profiles-list-container" class="profiles-list-container">
-              <!-- Injected profiles -->
+              <!-- Avatar Quick Selector -->
+              <div class="clean-avatar-picker">
+                <button class="avatar-opt-btn" data-avatar="🌲">🌲</button>
+                <button class="avatar-opt-btn" data-avatar="🏔️">🏔️</button>
+                <button class="avatar-opt-btn" data-avatar="🦬">🦬</button>
+                <button class="avatar-opt-btn" data-avatar="🧭">🧭</button>
+                <button class="avatar-opt-btn" data-avatar="🐻">🐻</button>
+                <button class="avatar-opt-btn" data-avatar="🦅">🦅</button>
+                <button class="avatar-opt-btn" data-avatar="🐺">🐺</button>
+                <button class="avatar-opt-btn" data-avatar="🛶">🛶</button>
+                <button class="avatar-opt-btn" data-avatar="⛺">⛺</button>
+                <button class="avatar-opt-btn" data-avatar="👑">👑</button>
+              </div>
+
+              <!-- Switch Explorer Personas -->
+              <div class="clean-persona-switch-row">
+                <label for="persona-select-dropdown" class="form-label" style="margin-bottom:0;">Switch Persona:</label>
+                <select id="persona-select-dropdown" class="toolbar-select" style="flex:1;">
+                  <!-- Options injected -->
+                </select>
+              </div>
             </div>
 
-            <div class="add-profile-row">
-              <input type="text" id="new-profile-name-input" class="toolbar-select" placeholder="New Explorer Name..." style="flex: 1;" />
-              <button id="add-profile-btn" class="drawer-action-btn primary">+ Create Persona</button>
+            <!-- Right: Cross-Instance Cloud Sync & Backup -->
+            <div class="clean-sync-box">
+              <h4 class="sync-box-title">☁️ Cross-Instance Sync &amp; Backup</h4>
+              <p class="sync-box-desc">
+                Your profile is saved automatically in your browser. Use your <strong>Portable Sync Code</strong> or <strong>Passport File</strong> to restore your progress on any other phone, laptop, or browser instance instantly!
+              </p>
+
+              <div class="sync-actions-row">
+                <button id="copy-sync-code-btn" class="drawer-action-btn primary" style="flex:1; justify-content:center;">
+                  <span>📋 Copy Sync Code</span>
+                </button>
+                <button id="download-passport-btn" class="drawer-action-btn" style="flex:1; justify-content:center;">
+                  <span>💾 Download Backup</span>
+                </button>
+              </div>
+
+              <!-- Import Sync Code -->
+              <div class="sync-import-row">
+                <input type="text" id="import-sync-code-input" class="form-input" placeholder="Paste Sync Code or JSON..." style="flex:1;" />
+                <button id="import-sync-code-btn" class="drawer-action-btn primary">Restore</button>
+              </div>
             </div>
+
           </div>
         </div>
 

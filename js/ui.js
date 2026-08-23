@@ -1,6 +1,6 @@
 /**
  * The Terrain - UI Controller
- * Manages map views, community profiles page, sidebar cards, detail drawer, wishlist, adventure passport, visit logging, and toasts.
+ * Manages map views, community profiles page, sidebar cards, detail drawer, wishlist, adventure passport, sync engine, and toasts.
  */
 
 class TerrainUI {
@@ -10,7 +10,7 @@ class TerrainUI {
     this.activePark = null;
     this.selectedVisitRating = 5;
     this.selectedCommAvatar = "🌲";
-    this.currentView = "map"; // "map" or "community"
+    this.currentView = "map";
 
     this.dom = {
       // Containers & Views
@@ -98,29 +98,18 @@ class TerrainUI {
       passportStampsGrid: document.getElementById("passport-stamps-grid"),
 
       // Passport Achievements Tab
-      achievementsUnlockedTitle: document.getElementById("achievements-unlocked-title"),
       achievementsGrid: document.getElementById("achievements-grid"),
 
-      // Passport Territory Tab
-      territoryUsStates: document.getElementById("territory-us-states"),
-      territoryCaProvinces: document.getElementById("territory-ca-provinces"),
-      territoryUsTags: document.getElementById("territory-us-tags"),
-      territoryCaTags: document.getElementById("territory-ca-tags"),
-      progUsNp: document.getElementById("prog-us-np"),
-      barUsNp: document.getElementById("bar-us-np"),
-      progCaNp: document.getElementById("prog-ca-np"),
-      barCaNp: document.getElementById("bar-ca-np"),
-      progSp: document.getElementById("prog-sp"),
-
-      // Passport Profile Tab
+      // Passport Profile & Sync Tab
       profileAvatarDisplay: document.getElementById("profile-avatar-display"),
       profileNameInput: document.getElementById("profile-name-input"),
       profileRankDisplay: document.getElementById("profile-rank-display"),
-      profileJoinedDate: document.getElementById("profile-joined-date"),
       avatarOptBtns: document.querySelectorAll(".avatar-opt-btn"),
-      profilesListContainer: document.getElementById("profiles-list-container"),
-      newProfileNameInput: document.getElementById("new-profile-name-input"),
-      addProfileBtn: document.getElementById("add-profile-btn"),
+      personaSelectDropdown: document.getElementById("persona-select-dropdown"),
+      copySyncCodeBtn: document.getElementById("copy-sync-code-btn"),
+      downloadPassportBtn: document.getElementById("download-passport-btn"),
+      importSyncCodeInput: document.getElementById("import-sync-code-input"),
+      importSyncCodeBtn: document.getElementById("import-sync-code-btn"),
 
       // Log Visit Modal
       visitModal: document.getElementById("visit-modal"),
@@ -407,7 +396,6 @@ class TerrainUI {
       this.dom.profileNameInput.addEventListener("change", (e) => {
         window.storage.updateActiveProfile({ name: e.target.value });
         this.updateHeaderProfile();
-        this.renderProfilesList();
         this.renderCommunityRoster();
         this.showToast("Profile name updated!", "success");
       });
@@ -419,24 +407,80 @@ class TerrainUI {
         window.storage.updateActiveProfile({ avatar: av });
         if (this.dom.profileAvatarDisplay) this.dom.profileAvatarDisplay.textContent = av;
         this.updateHeaderProfile();
-        this.renderProfilesList();
         this.renderCommunityRoster();
         this.showToast(`Avatar changed to ${av}!`, "success");
       });
     });
 
-    if (this.dom.addProfileBtn) {
-      this.dom.addProfileBtn.addEventListener("click", () => {
-        const name = this.dom.newProfileNameInput.value;
-        if (!name.trim()) return;
-        const newProf = window.storage.createProfile(name);
-        this.dom.newProfileNameInput.value = "";
-        this.updateHeaderProfile();
-        this.renderPassportModalContent();
-        this.renderCommunityRoster();
-        this.renderParksList(this.filter.getFilteredData());
-        this.map.updateParks(this.filter.getFilteredData());
-        this.showToast(`Welcome explorer: ${newProf.name}!`, "success");
+    // Persona Selector Dropdown
+    if (this.dom.personaSelectDropdown) {
+      this.dom.personaSelectDropdown.addEventListener("change", (e) => {
+        const selectedId = e.target.value;
+        if (selectedId === "__new__") {
+          const name = prompt("Enter name for new Explorer Persona:", "Trail Blazer");
+          if (name && name.trim()) {
+            const newProf = window.storage.createProfile(name.trim());
+            this.updateHeaderProfile();
+            this.renderPassportModalContent();
+            this.renderCommunityRoster();
+            this.renderParksList(this.filter.getFilteredData());
+            this.map.updateParks(this.filter.getFilteredData());
+            this.showToast(`Created persona: ${newProf.name}!`, "success");
+          } else {
+            this.renderPersonaDropdown();
+          }
+        } else {
+          window.storage.setActiveProfile(selectedId);
+          this.updateHeaderProfile();
+          this.renderPassportModalContent();
+          this.renderCommunityRoster();
+          this.renderParksList(this.filter.getFilteredData());
+          this.map.updateParks(this.filter.getFilteredData());
+          this.showToast(`Switched to: ${window.storage.getActiveProfile().name}`, "info");
+        }
+      });
+    }
+
+    // Cloud Sync: Copy Sync Code
+    if (this.dom.copySyncCodeBtn) {
+      this.dom.copySyncCodeBtn.addEventListener("click", () => {
+        const code = window.storage.exportSyncCode();
+        if (!code) return;
+        navigator.clipboard.writeText(code)
+          .then(() => this.showToast("Sync Code copied! Paste on any device to restore.", "success"))
+          .catch(() => prompt("Your Portable Sync Code:", code));
+      });
+    }
+
+    // Cloud Sync: Download Passport Backup File
+    if (this.dom.downloadPassportBtn) {
+      this.dom.downloadPassportBtn.addEventListener("click", () => {
+        window.storage.downloadPassportBackup();
+        this.showToast("Passport backup file downloaded!", "success");
+      });
+    }
+
+    // Cloud Sync: Restore / Import Sync Code
+    if (this.dom.importSyncCodeBtn) {
+      this.dom.importSyncCodeBtn.addEventListener("click", () => {
+        const input = this.dom.importSyncCodeInput?.value;
+        if (!input || !input.trim()) {
+          this.showToast("Please paste a Sync Code or JSON backup first.", "warning");
+          return;
+        }
+
+        const res = window.storage.importProfileData(input);
+        if (res.success) {
+          if (this.dom.importSyncCodeInput) this.dom.importSyncCodeInput.value = "";
+          this.updateHeaderProfile();
+          this.renderPassportModalContent();
+          this.renderCommunityRoster();
+          this.renderParksList(this.filter.getFilteredData());
+          this.map.updateParks(this.filter.getFilteredData());
+          this.showToast(`🎉 Restored profile: ${res.profile.name}! All stamps & progress loaded.`, "success");
+        } else {
+          this.showToast(`Import failed: ${res.error || 'Invalid code'}`, "warning");
+        }
       });
     }
 
@@ -445,7 +489,6 @@ class TerrainUI {
       this.dom.visitModalCloseBtn.addEventListener("click", () => this.closeVisitModal());
     }
 
-    // Star Rating Picker
     if (this.dom.visitStarPicker) {
       const starBtns = this.dom.visitStarPicker.querySelectorAll(".star-btn");
       starBtns.forEach(btn => {
@@ -460,7 +503,6 @@ class TerrainUI {
       });
     }
 
-    // Submit Visit Form
     if (this.dom.submitVisitBtn) {
       this.dom.submitVisitBtn.addEventListener("click", () => {
         this.submitVisitLog();
@@ -514,7 +556,7 @@ class TerrainUI {
       this.updateHeaderProfile();
       this.updateVisitedCounter();
       this.renderCommunityRoster();
-      if (event === "visit_logged" || event === "visit_removed" || event === "profile_changed") {
+      if (event === "visit_logged" || event === "visit_removed" || event === "profile_changed" || event === "profile_imported") {
         this.map.updateParks(this.filter.getFilteredData());
         this.renderParksList(this.filter.getFilteredData());
         if (this.activePark) {
@@ -536,7 +578,6 @@ class TerrainUI {
       if (this.dom.terrainMapToolbar) this.dom.terrainMapToolbar.style.display = "flex";
       if (this.dom.headerMapControls) this.dom.headerMapControls.style.display = "flex";
       
-      // Invalidate Leaflet map size to prevent rendering glitch
       setTimeout(() => {
         if (this.map && this.map.map) {
           this.map.map.invalidateSize();
@@ -554,7 +595,6 @@ class TerrainUI {
     }
   }
 
-  // Populate Favorite Park Dropdown on Community Page
   populateCommunityParkSelect() {
     if (!this.dom.commInputFavoritePark) return;
     const parks = window.PARKS_DATA || [];
@@ -564,7 +604,6 @@ class TerrainUI {
     }).join("");
   }
 
-  // Submit Community Profile Registration Form
   submitCommunityProfile() {
     const name = this.dom.commInputName.value.trim();
     if (!name) return;
@@ -595,7 +634,6 @@ class TerrainUI {
     this.showToast(`🎉 Explorer profile "${newProf.name}" registered successfully! (+200 XP)`, "success");
   }
 
-  // Render Community Explorers Roster Grid
   renderCommunityRoster() {
     if (!this.dom.communityExplorersGrid) return;
     const profiles = window.storage.getCommunityProfiles();
@@ -637,7 +675,6 @@ class TerrainUI {
     }).join("");
   }
 
-  // Update Header Profile Info & XP Bar
   updateHeaderProfile() {
     const profile = window.storage.getActiveProfile();
     if (!profile || !window.passport) return;
@@ -657,7 +694,6 @@ class TerrainUI {
     }
   }
 
-  // Render list of parks in sidebar
   renderParksList(parks) {
     if (!this.dom.parksListContainer) return;
     this.dom.parksListContainer.innerHTML = "";
@@ -728,7 +764,6 @@ class TerrainUI {
     });
   }
 
-  // Open Park Detail Drawer
   openDrawer(park) {
     this.activePark = park;
     const flag = park.country === "US" ? "🇺🇸 United States" : "🇨🇦 Canada";
@@ -743,7 +778,6 @@ class TerrainUI {
     }
     if (this.dom.drawerLocation) this.dom.drawerLocation.textContent = `📍 ${park.stateProvince} (${park.country})`;
 
-    // Stats
     if (this.dom.drawerStatEst) this.dom.drawerStatEst.textContent = park.establishedYear;
     if (this.dom.drawerStatArea) this.dom.drawerStatArea.textContent = `${(park.areaAcres || 0).toLocaleString()} acres (${(park.areaSqKm || 0).toLocaleString()} km²)`;
     if (this.dom.drawerStatVisitors) this.dom.drawerStatVisitors.textContent = park.annualVisitors || "N/A";
@@ -831,7 +865,6 @@ class TerrainUI {
     });
   }
 
-  // Tag pills toolbar
   renderTagPills() {
     if (!this.dom.tagPillsContainer) return;
     this.dom.tagPillsContainer.innerHTML = "";
@@ -967,7 +1000,7 @@ class TerrainUI {
   }
 
   // ==========================================
-  // --- Passport & Profiles Modal ---
+  // --- Clean Passport & Profiles Modal ---
   // ==========================================
   openPassportModal() {
     this.renderPassportModalContent();
@@ -998,19 +1031,19 @@ class TerrainUI {
     const visitedParks = window.passport.getVisitedParkObjects();
     const stats = window.passport.getTravelStats();
 
-    // Tab 1: Stamps Overview
+    // Tab 1: Stamps Overview Chips
     if (this.dom.stampsCountTotal) this.dom.stampsCountTotal.textContent = stats.totalVisited;
     if (this.dom.stampsAcresTotal) this.dom.stampsAcresTotal.textContent = `${(stats.totalAcreage / 1000000).toFixed(1)}M`;
     if (this.dom.stampsXpTotal) this.dom.stampsXpTotal.textContent = `${progress.xp.toLocaleString()} XP`;
 
-    // Render Stamps Grid
+    // Render Clean Stamps Grid
     if (this.dom.passportStampsGrid) {
       if (visitedParks.length === 0) {
         this.dom.passportStampsGrid.innerHTML = `
-          <div class="wishlist-empty" style="grid-column: 1 / -1;">
+          <div class="wishlist-empty" style="grid-column: 1 / -1; padding: 24px;">
             <div class="wishlist-empty-icon">📔</div>
             <h4>No Passport Stamps Yet</h4>
-            <p>Click "Stamp in Passport" on any park you have visited to collect vintage cancellation stamps and earn Explorer XP!</p>
+            <p>Click "Stamp in Passport" on any park to collect vintage cancellation stamps and level up your explorer rank!</p>
           </div>
         `;
       } else {
@@ -1026,7 +1059,6 @@ class TerrainUI {
           `;
         }).join("");
 
-        // Click stamp card to jump to park on map
         this.dom.passportStampsGrid.querySelectorAll(".passport-stamp-card").forEach(card => {
           card.addEventListener("click", () => {
             const id = card.getAttribute("data-stamp-id");
@@ -1038,13 +1070,8 @@ class TerrainUI {
       }
     }
 
-    // Tab 2: Achievements
+    // Tab 2: 6 Core Achievements
     const achievements = window.passport.getAllAchievementsStatus();
-    const unlockedCount = achievements.filter(a => a.isUnlocked).length;
-    if (this.dom.achievementsUnlockedTitle) {
-      this.dom.achievementsUnlockedTitle.textContent = `Unlocked ${unlockedCount} / ${achievements.length} Badges`;
-    }
-
     if (this.dom.achievementsGrid) {
       this.dom.achievementsGrid.innerHTML = achievements.map(ach => `
         <div class="achievement-card ${ach.isUnlocked ? "is-unlocked" : ""}">
@@ -1061,92 +1088,23 @@ class TerrainUI {
       `).join("");
     }
 
-    // Tab 3: Travel Territory
-    if (this.dom.territoryUsStates) this.dom.territoryUsStates.textContent = `${stats.visitedUSStatesCount} / 50`;
-    if (this.dom.territoryCaProvinces) this.dom.territoryCaProvinces.textContent = `${stats.visitedCAProvincesCount} / 13`;
-
-    if (this.dom.territoryUsTags) {
-      this.dom.territoryUsTags.innerHTML = stats.visitedUSStatesList.length > 0
-        ? stats.visitedUSStatesList.map(s => `<span class="territory-pill">${s}</span>`).join("")
-        : `<span style="font-size:0.75rem; color:var(--text-muted);">No US states stamped yet</span>`;
-    }
-
-    if (this.dom.territoryCaTags) {
-      this.dom.territoryCaTags.innerHTML = stats.visitedCAProvincesList.length > 0
-        ? stats.visitedCAProvincesList.map(p => `<span class="territory-pill">${p}</span>`).join("")
-        : `<span style="font-size:0.75rem; color:var(--text-muted);">No Canadian provinces stamped yet</span>`;
-    }
-
-    // Progress Bars
-    const usNpPercent = Math.min(100, Math.round((stats.usNationalVisited / 63) * 100));
-    if (this.dom.progUsNp) this.dom.progUsNp.textContent = `${stats.usNationalVisited} / 63 (${usNpPercent}%)`;
-    if (this.dom.barUsNp) this.dom.barUsNp.style.width = `${usNpPercent}%`;
-
-    const caNpPercent = Math.min(100, Math.round((stats.caNationalVisited / 48) * 100));
-    if (this.dom.progCaNp) this.dom.progCaNp.textContent = `${stats.caNationalVisited} / 48 (${caNpPercent}%)`;
-    if (this.dom.barCaNp) this.dom.barCaNp.style.width = `${caNpPercent}%`;
-
-    if (this.dom.progSp) this.dom.progSp.textContent = `${stats.stateParksVisited} Preserves Logged`;
-
-    // Tab 4: Profile Settings
+    // Tab 3: Profile Editor & Sync
     if (this.dom.profileAvatarDisplay) this.dom.profileAvatarDisplay.textContent = profile.avatar || "🌲";
     if (this.dom.profileNameInput) this.dom.profileNameInput.value = profile.name || "Trail Explorer";
     if (this.dom.profileRankDisplay) this.dom.profileRankDisplay.textContent = `${progress.rank.title} (Lvl ${progress.level})`;
 
-    this.renderProfilesList();
+    this.renderPersonaDropdown();
   }
 
-  renderProfilesList() {
-    if (!this.dom.profilesListContainer) return;
+  renderPersonaDropdown() {
+    if (!this.dom.personaSelectDropdown) return;
     const profiles = window.storage.getProfiles();
     const activeProf = window.storage.getActiveProfile();
 
-    this.dom.profilesListContainer.innerHTML = profiles.map(p => {
-      const isActive = p.id === activeProf.id;
-      const visitedCount = Object.keys(p.visited || {}).length;
-      return `
-        <div class="profile-item-row ${isActive ? "is-active" : ""}" data-profile-id="${p.id}">
-          <div class="profile-item-left">
-            <span class="profile-item-avatar">${p.avatar || "🌲"}</span>
-            <div>
-              <div class="profile-item-name">${p.name} ${isActive ? " (Active)" : ""}</div>
-              <div class="profile-item-badge">${visitedCount} Stamped Parks &bull; ${(p.favorites || []).length} Saved</div>
-            </div>
-          </div>
-          ${!isActive && profiles.length > 1 ? `<button class="wishlist-item-del-btn" data-action="del-profile" data-id="${p.id}" title="Delete Persona">🗑️</button>` : ""}
-        </div>
-      `;
-    }).join("");
-
-    // Bind profile clicks
-    this.dom.profilesListContainer.querySelectorAll(".profile-item-row").forEach(row => {
-      row.addEventListener("click", (e) => {
-        if (e.target.closest("[data-action='del-profile']")) return;
-        const id = row.getAttribute("data-profile-id");
-        window.storage.setActiveProfile(id);
-        this.updateHeaderProfile();
-        this.renderPassportModalContent();
-        this.renderCommunityRoster();
-        this.renderParksList(this.filter.getFilteredData());
-        this.map.updateParks(this.filter.getFilteredData());
-        this.showToast(`Switched to explorer: ${window.storage.getActiveProfile().name}`, "info");
-      });
-    });
-
-    this.dom.profilesListContainer.querySelectorAll("[data-action='del-profile']").forEach(btn => {
-      btn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const id = btn.getAttribute("data-id");
-        if (confirm("Delete this explorer persona?")) {
-          window.storage.deleteProfile(id);
-          this.updateHeaderProfile();
-          this.renderPassportModalContent();
-          this.renderCommunityRoster();
-          this.renderParksList(this.filter.getFilteredData());
-          this.map.updateParks(this.filter.getFilteredData());
-        }
-      });
-    });
+    this.dom.personaSelectDropdown.innerHTML = `
+      ${profiles.map(p => `<option value="${p.id}" ${p.id === activeProf.id ? "selected" : ""}>${p.avatar || "🌲"} ${p.name}</option>`).join("")}
+      <option value="__new__">➕ Create New Persona...</option>
+    `;
   }
 
   // Wishlist

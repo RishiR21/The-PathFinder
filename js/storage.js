@@ -1,6 +1,6 @@
 /**
- * The Terrain - Enhanced Storage Manager
- * Supports multi-profile management, community explorer registry, social links (X, LinkedIn), visited park logs, and favorites.
+ * The Terrain - Enhanced Storage & Sync Manager
+ * Supports multi-profile management, export/import portable sync codes, cross-instance JSON backups, and local persistence.
  */
 
 const STORAGE_KEYS = {
@@ -25,7 +25,6 @@ const DEFAULT_PROFILE = {
   visited: {}
 };
 
-// Seed Community Profiles with Creator & Featured Explorers
 const DEFAULT_COMMUNITY_PROFILES = [
   {
     id: "creator_rishi",
@@ -94,6 +93,9 @@ class StorageManager {
     this.basemap = this.load(STORAGE_KEYS.BASEMAP, "terrain");
     this.listeners = [];
 
+    // Check if imported from URL hash
+    this.checkUrlImport();
+
     if (!this.getActiveProfile()) {
       this.activeProfileId = this.profiles[0]?.id || "profile_default";
       this.save(STORAGE_KEYS.ACTIVE_PROFILE_ID, this.activeProfileId);
@@ -150,7 +152,7 @@ class StorageManager {
       id: "profile_" + Date.now(),
       name: (name || "New Explorer").trim(),
       avatar: avatar || "🌲",
-      title: "Trail Scout",
+      title: socialLinks.title || "Trail Scout",
       bio: socialLinks.bio || "Passionate adventurer exploring North America's wildest parks.",
       homeBase: socialLinks.homeBase || "North America",
       favoritePark: socialLinks.favoritePark || "us-np-yellowstone",
@@ -165,7 +167,6 @@ class StorageManager {
     this.save(STORAGE_KEYS.PROFILES, this.profiles);
     this.setActiveProfile(newProfile.id);
 
-    // Also register into Community Explorer Directory
     this.addCommunityProfile({
       id: newProfile.id,
       name: newProfile.name,
@@ -203,7 +204,6 @@ class StorageManager {
 
     this.save(STORAGE_KEYS.PROFILES, this.profiles);
 
-    // Sync to community profiles if present
     const commIndex = this.communityProfiles.findIndex(c => c.id === profile.id);
     if (commIndex >= 0) {
       this.communityProfiles[commIndex] = {
@@ -237,13 +237,134 @@ class StorageManager {
     return true;
   }
 
+  // =========================================================================
+  // --- Cross-Instance Portable Sync, Export & Import ---
+  // =========================================================================
+  exportProfileJson() {
+    const profile = this.getActiveProfile();
+    if (!profile) return null;
+
+    const payload = {
+      app: "TheTerrain",
+      version: "2.0",
+      exportedAt: new Date().toISOString(),
+      profile: {
+        id: profile.id,
+        name: profile.name,
+        avatar: profile.avatar,
+        title: profile.title,
+        bio: profile.bio,
+        homeBase: profile.homeBase,
+        favoritePark: profile.favoritePark,
+        socialX: profile.socialX,
+        socialLinkedIn: profile.socialLinkedIn,
+        favorites: profile.favorites || [],
+        visited: profile.visited || {}
+      }
+    };
+
+    return JSON.stringify(payload, null, 2);
+  }
+
+  exportSyncCode() {
+    const json = this.exportProfileJson();
+    if (!json) return "";
+    try {
+      return btoa(unescape(encodeURIComponent(json)));
+    } catch (e) {
+      return btoa(json);
+    }
+  }
+
+  importProfileData(inputString) {
+    try {
+      let parsed = null;
+      const cleanInput = inputString.trim();
+
+      if (cleanInput.startsWith("{")) {
+        parsed = JSON.parse(cleanInput);
+      } else {
+        // Base64 sync code
+        try {
+          const decoded = decodeURIComponent(escape(atob(cleanInput)));
+          parsed = JSON.parse(decoded);
+        } catch (e) {
+          parsed = JSON.parse(atob(cleanInput));
+        }
+      }
+
+      if (!parsed || (!parsed.profile && !parsed.name)) {
+        throw new Error("Invalid passport data format");
+      }
+
+      const importedProf = parsed.profile || parsed;
+      const finalProfile = {
+        id: importedProf.id || ("profile_" + Date.now()),
+        name: (importedProf.name || "Restored Explorer").trim(),
+        avatar: importedProf.avatar || "🌲",
+        title: importedProf.title || "Restored Explorer",
+        bio: importedProf.bio || "Passionate adventurer exploring North America.",
+        homeBase: importedProf.homeBase || "North America",
+        favoritePark: importedProf.favoritePark || "us-np-yellowstone",
+        socialX: importedProf.socialX || "https://x.com/1RishiR",
+        socialLinkedIn: importedProf.socialLinkedIn || "https://www.linkedin.com/in/rishi-ramchandani-73a74916b/",
+        createdAt: importedProf.createdAt || new Date().toISOString(),
+        favorites: Array.isArray(importedProf.favorites) ? importedProf.favorites : [],
+        visited: importedProf.visited && typeof importedProf.visited === "object" ? importedProf.visited : {}
+      };
+
+      const existingIndex = this.profiles.findIndex(p => p.id === finalProfile.id);
+      if (existingIndex >= 0) {
+        this.profiles[existingIndex] = finalProfile;
+      } else {
+        this.profiles.push(finalProfile);
+      }
+
+      this.save(STORAGE_KEYS.PROFILES, this.profiles);
+      this.setActiveProfile(finalProfile.id);
+      this.notify("profile_imported", finalProfile);
+      return { success: true, profile: finalProfile };
+    } catch (err) {
+      console.error("Import failed:", err);
+      return { success: false, error: err.message };
+    }
+  }
+
+  downloadPassportBackup() {
+    const json = this.exportProfileJson();
+    if (!json) return;
+
+    const profile = this.getActiveProfile();
+    const fileName = `terrain_passport_${(profile.name || 'explorer').replace(/\s+/g, '_').toLowerCase()}.json`;
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  checkUrlImport() {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const syncParam = urlParams.get("sync");
+      if (syncParam) {
+        this.importProfileData(syncParam);
+      }
+    } catch (e) {
+      // Ignore URL parsing errors
+    }
+  }
+
   // Community Profiles Registry
   getCommunityProfiles() {
     return [...this.communityProfiles];
   }
 
   addCommunityProfile(profileData) {
-    // Check if exists
     const existingIdx = this.communityProfiles.findIndex(p => p.id === profileData.id);
     if (existingIdx >= 0) {
       this.communityProfiles[existingIdx] = { ...this.communityProfiles[existingIdx], ...profileData };
