@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0d231a"/>
+      <stop offset="100%" stop-color="#04120c"/>
+    </linearGradient>
+    <linearGradient id="peakGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34d399"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <linearGradient id="peakBackGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#047857"/>
+    </linearGradient>
+    <linearGradient id="sunGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fde047"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Base Rounded Shield / Icon Shape -->
+  <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#bgGrad)" stroke="#10b981" stroke-width="2.5" stroke-opacity="0.6"/>
+
+  <!-- Golden Sun / Compass Orb -->
+  <circle cx="44" cy="20" r="7" fill="url(#sunGrad)"/>
+
+  <!-- Back Mountain Peak -->
+  <polygon points="22,22 42,48 2,48" fill="url(#peakBackGrad)" opacity="0.85"/>
+  <!-- Back Peak Snow Cap -->
+  <polygon points="22,22 28,30 24,31 21,29 16,30" fill="#ffffff" opacity="0.9"/>
+
+  <!-- Front Main Mountain Peak -->
+  <polygon points="36,16 60,52 12,52" fill="url(#peakGrad)"/>
+  <!-- Front Peak Snow Cap -->
+  <polygon points="36,16 43,27 38,29 34,26 28,28" fill="#ffffff"/>
+
+  <!-- Pine Tree Silhouette in Foreground -->
+  <polygon points="20,38 24,44 22,44 25,48 21,48 26,53 14,53 19,48 15,48 18,44 16,44" fill="#042f1f"/>
+</svg>
