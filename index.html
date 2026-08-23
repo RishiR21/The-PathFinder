@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>The Terrain — Interactive US & Canada Parks Explorer</title>
 
-  <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+  <!-- Google Fonts: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
@@ -34,44 +34,23 @@
           </div>
           <div class="logo-text">
             <span class="logo-title">THE TERRAIN</span>
-            <span class="logo-subtitle">US & Canada Parks Explorer</span>
+            <span class="logo-subtitle">US &amp; Canada Parks Explorer</span>
           </div>
         </a>
-
-        <!-- Main View Switcher Tabs (Map Explorer vs Community & Profiles) -->
-        <nav class="main-view-switcher" role="navigation" aria-label="Main Navigation">
-          <button id="view-tab-map" class="view-switch-btn is-active" title="Explore Interactive Map">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-              <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
-              <line x1="8" y1="2" x2="8" y2="18"></line>
-              <line x1="16" y1="6" x2="16" y2="22"></line>
-            </svg>
-            <span>Map Explorer</span>
-          </button>
-          <button id="view-tab-community" class="view-switch-btn" title="View & Add Explorer Profiles">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-              <circle cx="9" cy="7" r="4"></circle>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-            </svg>
-            <span>Community & Profiles</span>
-          </button>
-        </nav>
       </div>
 
-      <!-- Center Controls: Mode Toggle & Country Filter & Search (Visible on Map View) -->
+      <!-- Center Controls: Mode Toggle & Country Filter & Search -->
       <div class="header-center" id="header-map-controls">
         <!-- Park Mode Switcher (All / National / State) -->
-        <div class="mode-toggle-group" role="group" aria-label="Park Classification Toggle">
+        <div class="mode-toggle-group" role="group" aria-label="Park Mode">
           <button class="mode-btn is-active" data-mode-toggle="all" title="View All Parks">
             <span>🌟 All Parks</span>
           </button>
           <button class="mode-btn" data-mode-toggle="national" title="View National Parks Only">
             <span>🌲 National Parks</span>
           </button>
-          <button class="mode-btn" data-mode-toggle="state" title="View State & Provincial Parks Only">
-            <span>🍂 State & Provincial</span>
+          <button class="mode-btn" data-mode-toggle="state" title="View State &amp; Provincial Parks Only">
+            <span>🍂 State &amp; Provincial</span>
           </button>
         </div>
 
@@ -79,7 +58,7 @@
         <div class="country-toggle-group" role="group" aria-label="Country Filter">
           <button class="country-btn is-active" data-country-toggle="all" title="All Countries">All</button>
           <button class="country-btn" data-country-toggle="US" title="United States Parks">🇺🇸 US</button>
-          <button class="country-btn" data-country-toggle="CA" title="Canada Parks">🇨🇦 Canada</button>
+          <button class="country-btn" data-country-toggle="CA" title="Canada Parks">🇨🇦 CA</button>
         </div>
 
         <!-- Instant Search -->
@@ -93,43 +72,38 @@
         </div>
       </div>
 
-      <!-- Header Action Buttons & Explorer Profile -->
+      <!-- Header Action Buttons -->
       <div class="header-actions">
-        <!-- Explorer Passport & Level Button -->
-        <button id="passport-modal-btn" class="header-profile-btn" title="Open My Adventure Passport & Profile">
-          <div class="profile-avatar-badge" id="header-avatar">🌲</div>
-          <div class="profile-info-pill">
-            <div class="profile-top-line">
-              <span id="header-profile-name" class="profile-name">Trail Explorer</span>
-              <span id="header-level-badge" class="level-badge">Lvl 1</span>
-            </div>
-            <div class="profile-xp-bar-wrap">
-              <div id="header-xp-bar" class="profile-xp-bar" style="width: 15%;"></div>
-            </div>
-          </div>
+        <!-- My Journey / Visited Log -->
+        <button id="journey-modal-btn" class="header-action-btn journey-btn" title="View My Visited Parks &amp; Travel Journal">
+          <span>🌲 My Journey</span>
+          <span id="journey-badge-count" class="badge-count" style="display: none;">0</span>
         </button>
 
-        <button id="surprise-me-btn" class="header-action-btn" title="Discover a Random Park">
-          <span>🎲 Surprise Me</span>
-        </button>
-
+        <!-- Wishlist -->
         <button id="wishlist-toggle-btn" class="header-action-btn" title="View Saved Bucket List">
           <span>⭐ Wishlist</span>
           <span id="wishlist-badge-count" class="badge-count" style="display: none;">0</span>
         </button>
 
-        <button id="stats-modal-btn" class="header-action-btn" title="View Park Insights & Preserved Land Stats">
-          <span>📊 Insights</span>
+        <!-- Surprise Me -->
+        <button id="surprise-me-btn" class="header-action-btn" title="Discover a Random Park">
+          <span>🎲 Surprise Me</span>
+        </button>
+
+        <!-- About / Chief Architect & Insights Modal Button -->
+        <button id="about-modal-btn" class="header-action-btn" title="About The Terrain &amp; Chief Architect">
+          <span>ℹ️ About</span>
         </button>
       </div>
     </header>
 
-    <!-- Secondary Filter Toolbar (For Map View) -->
+    <!-- Secondary Filter Toolbar -->
     <div class="terrain-toolbar" id="terrain-map-toolbar">
       <div class="toolbar-left">
         <!-- Region / State / Province Dropdown -->
         <select id="region-select" class="toolbar-select" aria-label="Filter by State or Province">
-          <option value="all">📍 All States & Provinces</option>
+          <option value="all">📍 All States &amp; Provinces</option>
         </select>
 
         <!-- Sort Select -->
@@ -137,21 +111,21 @@
           <option value="featured">✨ Featured Order</option>
           <option value="name-asc">🔤 Name (A → Z)</option>
           <option value="name-desc">🔤 Name (Z → A)</option>
-          <option value="established-asc">⏳ Oldest Established First</option>
-          <option value="established-desc">⏳ Newest Established First</option>
-          <option value="area-desc">📐 Largest Area First</option>
+          <option value="established-asc">⏳ Oldest Established</option>
+          <option value="established-desc">⏳ Newest Established</option>
+          <option value="area-desc">📐 Largest Area</option>
           <option value="rating-desc">⭐ Highest Rated</option>
         </select>
 
         <!-- Visited-Only Quick Filter Pill -->
-        <button id="filter-visited-toggle-btn" class="filter-tag-pill visited-filter-pill" title="Filter to show only parks you've stamped as visited">
-          <span>✓ Stamped in Passport</span>
+        <button id="filter-visited-toggle-btn" class="filter-tag-pill visited-filter-pill" title="Filter to show only parks you have marked as visited">
+          <span>✓ Visited</span>
           <span id="filter-visited-count" class="tag-count">0</span>
         </button>
 
         <!-- Basemap Style Selector -->
         <select id="basemap-select" class="toolbar-select" aria-label="Select Basemap Style">
-          <option value="terrain">🗺️ Outdoor Topo Terrain</option>
+          <option value="terrain">🗺️ Topo Terrain</option>
           <option value="voyager">🧭 Clean Explorer</option>
           <option value="satellite">🛰️ Satellite Hybrid</option>
           <option value="dark">🌌 Dark Night Sky</option>
@@ -165,12 +139,12 @@
 
       <div class="toolbar-right">
         <span id="results-counter" class="results-counter">Loading parks...</span>
-        <button id="reset-filters-btn" class="reset-filters-btn" title="Clear all active filters">Reset Filters</button>
+        <button id="reset-filters-btn" class="reset-filters-btn" title="Clear all active filters">Reset</button>
       </div>
     </div>
 
-    <!-- VIEW 1: Main Map & Sidebar Explorer View -->
-    <main class="terrain-main-content" id="map-page-view">
+    <!-- Main Map & Sidebar Explorer View -->
+    <main class="terrain-main-content">
       <!-- Left Sidebar: Scrollable Park Cards -->
       <aside class="terrain-sidebar" aria-label="Parks Directory List">
         <div id="parks-list-container" class="parks-list-scroll">
@@ -204,164 +178,6 @@
       </div>
     </main>
 
-    <!-- VIEW 2: Dedicated Community & Explorer Profiles Page -->
-    <section class="community-page-container" id="community-page-view" style="display: none;">
-      <div class="community-page-scroll">
-        
-        <!-- Hero Header -->
-        <div class="community-hero-banner">
-          <div class="community-hero-content">
-            <span class="community-badge-tag">🌲 EXPLORER REGISTRY & COMMUNITY</span>
-            <h1 class="community-hero-title">Meet the Explorers Behind The Terrain</h1>
-            <p class="community-hero-desc">
-              Connect with passionate nature lovers, park rangers, and thru-hikers. Create your profile, share your social handles, and showcase your conquered wilderness.
-            </p>
-            <div class="community-hero-cta">
-              <a href="#create-profile-anchor" class="drawer-action-btn primary" id="jump-to-add-profile-btn">
-                <span>+ Register Your Profile</span>
-              </a>
-              <button class="drawer-action-btn" id="community-back-to-map-btn">
-                <span>🗺️ Return to Interactive Map</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Featured Creator Showcase Card -->
-        <div class="creator-showcase-section">
-          <div class="creator-card">
-            <div class="creator-header-banner">
-              <span class="creator-founder-badge">👑 APP FOUNDER & LEAD EXPLORER</span>
-              <div class="creator-level-pill">Level 10 Summit Legend</div>
-            </div>
-
-            <div class="creator-card-body">
-              <div class="creator-avatar-wrap">👑</div>
-              <div class="creator-main-info">
-                <h2 class="creator-name">Rishi Ramchandani</h2>
-                <p class="creator-title">Creator & Lead Architect &bull; 📍 Texas, USA</p>
-                <p class="creator-bio">
-                  Creator of <strong>The Terrain</strong>. Dedicated to building immersive, interactive mapping tools that celebrate conservation and empower people to explore every corner of the United States and Canada's protected wilderness.
-                </p>
-
-                <div class="creator-favorite-park">
-                  <span class="fav-park-label">Favorite Sanctuary:</span>
-                  <span class="fav-park-value">🦬 Yellowstone National Park &amp; Rocky Mountains</span>
-                </div>
-
-                <!-- Verified Social Profile Links -->
-                <div class="creator-social-links">
-                  <a href="https://x.com/1RishiR" target="_blank" rel="noopener noreferrer" class="social-btn x-twitter-btn" title="Follow Rishi on X (Twitter)">
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                    </svg>
-                    <span>Connect on X (@1RishiR)</span>
-                  </a>
-
-                  <a href="https://www.linkedin.com/in/rishi-ramchandani-73a74916b/" target="_blank" rel="noopener noreferrer" class="social-btn linkedin-btn" title="Connect on LinkedIn">
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-                      <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.2V10.9H6.46M7.83 6.45a1.6 1.6 0 0 0-1.6 1.6a1.6 1.6 0 0 0 1.6 1.6a1.6 1.6 0 0 0 1.6-1.6a1.6 1.6 0 0 0-1.6-1.6z"/>
-                    </svg>
-                    <span>LinkedIn Profile</span>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Add Profile & Community Roster Split Section -->
-        <div class="community-grid-section" id="create-profile-anchor">
-          
-          <!-- Left Column: Add / Register New Profile Form -->
-          <div class="add-community-profile-card">
-            <div class="card-section-header">
-              <h3 class="community-card-title">📝 Add Explorer Profile</h3>
-              <p class="community-card-subtitle">Create your personal explorer card with your social links and favorite park.</p>
-            </div>
-
-            <form id="community-add-profile-form" class="community-profile-form">
-              <div class="form-row-2col">
-                <div class="form-field">
-                  <label for="comm-input-name" class="form-label">Full Name / Trail Handle *</label>
-                  <input type="text" id="comm-input-name" class="form-input" placeholder="e.g. Alex Wilderness" required />
-                </div>
-                <div class="form-field">
-                  <label for="comm-input-title" class="form-label">Explorer Tagline</label>
-                  <input type="text" id="comm-input-title" class="form-input" placeholder="e.g. Canyon Backpacker" />
-                </div>
-              </div>
-
-              <!-- Avatar Picker -->
-              <div class="form-field">
-                <label class="form-label">Select Avatar Icon</label>
-                <div class="community-avatar-selector" id="comm-avatar-picker">
-                  <button type="button" class="comm-avatar-btn is-active" data-avatar="🌲">🌲</button>
-                  <button type="button" class="comm-avatar-btn" data-avatar="🏔️">🏔️</button>
-                  <button type="button" class="comm-avatar-btn" data-avatar="🦬">🦬</button>
-                  <button type="button" class="comm-avatar-btn" data-avatar="🧭">🧭</button>
-                  <button type="button" class="comm-avatar-btn" data-avatar="🐻">🐻</button>
-                  <button type="button" class="comm-avatar-btn" data-avatar="🦅">🦅</button>
-                  <button type="button" class="comm-avatar-btn" data-avatar="🐺">🐺</button>
-                  <button type="button" class="comm-avatar-btn" data-avatar="🛶">🛶</button>
-                  <button type="button" class="comm-avatar-btn" data-avatar="⛺">⛺</button>
-                  <button type="button" class="comm-avatar-btn" data-avatar="👑">👑</button>
-                </div>
-              </div>
-
-              <div class="form-row-2col">
-                <div class="form-field">
-                  <label for="comm-input-home" class="form-label">Home Base / Location</label>
-                  <input type="text" id="comm-input-home" class="form-input" placeholder="e.g. Seattle, WA or Calgary, AB" />
-                </div>
-                <div class="form-field">
-                  <label for="comm-input-favorite-park" class="form-label">Favorite Park Sanctuary</label>
-                  <select id="comm-input-favorite-park" class="form-select">
-                    <!-- Populated dynamically -->
-                  </select>
-                </div>
-              </div>
-
-              <!-- Social Links -->
-              <div class="form-row-2col">
-                <div class="form-field">
-                  <label for="comm-input-x" class="form-label">X (Twitter) URL or Handle</label>
-                  <input type="text" id="comm-input-x" class="form-input" placeholder="https://x.com/yourhandle" value="https://x.com/1RishiR" />
-                </div>
-                <div class="form-field">
-                  <label for="comm-input-linkedin" class="form-label">LinkedIn Profile URL</label>
-                  <input type="text" id="comm-input-linkedin" class="form-input" placeholder="https://linkedin.com/in/yourprofile" value="https://www.linkedin.com/in/rishi-ramchandani-73a74916b/" />
-                </div>
-              </div>
-
-              <div class="form-field">
-                <label for="comm-input-bio" class="form-label">Bio & Favorite Wilderness Memory</label>
-                <textarea id="comm-input-bio" class="form-textarea" rows="3" placeholder="Tell other explorers about your favorite trails, camping stories, or bucket list goals..."></textarea>
-              </div>
-
-              <button type="submit" class="drawer-action-btn primary" style="width: 100%; justify-content: center; padding: 12px;">
-                <span>★ Add Profile to Community Registry (+200 XP) ★</span>
-              </button>
-            </form>
-          </div>
-
-          <!-- Right Column: Registered Community Explorer Cards -->
-          <div class="community-roster-column">
-            <div class="card-section-header">
-              <h3 class="community-card-title">🏕️ Registered Community Explorers</h3>
-              <p class="community-card-subtitle">Browse profiles, inspect conquered territory, and connect.</p>
-            </div>
-
-            <div id="community-explorers-grid" class="community-explorers-grid">
-              <!-- Community Cards injected dynamically -->
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-    </section>
-
     <!-- Park Detail Drawer (Slides from Right) -->
     <div id="detail-drawer" class="terrain-drawer" role="dialog" aria-modal="true" aria-label="Park Details">
       <div class="drawer-header-banner">
@@ -381,8 +197,8 @@
       <div class="drawer-body">
         <!-- Action Buttons -->
         <div class="drawer-action-bar">
-          <button id="drawer-log-visit-btn" class="drawer-action-btn primary highlight-pulse">
-            <span>🌲 Stamp in Passport</span>
+          <button id="drawer-log-visit-btn" class="drawer-action-btn primary">
+            <span>🌲 Mark as Visited</span>
           </button>
           <button id="drawer-fav-btn" class="drawer-action-btn">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5l-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
@@ -394,19 +210,19 @@
           <a id="drawer-directions-link" href="#" target="_blank" rel="noopener noreferrer" class="drawer-action-btn">
             <span>Directions</span>
           </a>
-          <button id="drawer-share-btn" class="drawer-action-btn" title="Copy coordinates & share link">
+          <button id="drawer-share-btn" class="drawer-action-btn" title="Copy coordinates &amp; share link">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
           </button>
         </div>
 
-        <!-- Visited Stamp Banner (if visited) -->
+        <!-- Visited Status Banner (if visited) -->
         <div id="drawer-visited-stamp-banner" class="drawer-visited-stamp-banner" style="display: none;">
-          <div class="stamp-banner-icon">★</div>
+          <div class="stamp-banner-icon">✓</div>
           <div class="stamp-banner-info">
-            <h4 id="drawer-stamp-date">Stamped on AUG 23, 2026</h4>
+            <h4 id="drawer-stamp-date">Visited on AUG 23, 2026</h4>
             <p id="drawer-stamp-notes" class="stamp-banner-notes">"Great adventure!"</p>
           </div>
-          <button id="drawer-edit-visit-btn" class="stamp-edit-btn" title="Edit Visit Journal">✏️ Edit</button>
+          <button id="drawer-edit-visit-btn" class="stamp-edit-btn" title="Edit Trip Journal">✏️ Edit</button>
         </div>
 
         <!-- Metrics Grid -->
@@ -437,13 +253,13 @@
 
         <!-- Highlights & Iconic Viewpoints -->
         <div class="drawer-section">
-          <h3 class="drawer-section-title">Top Highlights & Trails</h3>
+          <h3 class="drawer-section-title">Top Highlights &amp; Trails</h3>
           <ul id="drawer-highlights" class="drawer-highlights-list"></ul>
         </div>
 
         <!-- Landscape & Activity Tags -->
         <div class="drawer-section">
-          <h3 class="drawer-section-title">Features & Activities</h3>
+          <h3 class="drawer-section-title">Features &amp; Activities</h3>
           <div id="drawer-tags" class="drawer-tags-wrap"></div>
         </div>
 
@@ -454,7 +270,7 @@
         </div>
 
         <div class="drawer-info-box">
-          <div class="info-box-title">🌦️ Climate & Weather</div>
+          <div class="info-box-title">🌦️ Climate &amp; Weather</div>
           <div id="drawer-climate" class="info-box-desc"></div>
         </div>
       </div>
@@ -482,174 +298,122 @@
       </div>
     </div>
 
-    <!-- CLEAN, STREAMLINED & NO-SCROLL ADVENTURE PASSPORT MODAL -->
-    <div id="passport-modal" class="terrain-modal clean-passport-modal" role="dialog" aria-modal="true" aria-label="Adventure Passport">
-      <div class="modal-header compact-modal-header">
-        <div class="passport-header-title-group">
-          <span class="passport-gold-icon">📔</span>
-          <div>
-            <h3 class="modal-title">Adventure Passport &amp; Explorer Profile</h3>
-          </div>
+    <!-- MY JOURNEY: Personal Travel & Visited Tracker Modal -->
+    <div id="journey-modal" class="terrain-modal journey-modal" role="dialog" aria-modal="true" aria-label="My Travel Journey">
+      <div class="modal-header">
+        <div class="modal-header-title-wrap">
+          <span style="font-size: 1.3rem;">🌲</span>
+          <h3 class="modal-title">My Wilderness Journey</h3>
         </div>
-        <button id="passport-modal-close-btn" class="drawer-close-btn" aria-label="Close passport">&times;</button>
+        <button id="journey-modal-close-btn" class="drawer-close-btn" aria-label="Close journey">&times;</button>
       </div>
 
-      <!-- Compact Clean Tabs Navigation -->
-      <div class="passport-tab-nav compact-tab-nav" role="tablist">
-        <button class="passport-tab-btn is-active" data-tab="stamps">
-          <span>🏷️ Stamp Book</span>
-        </button>
-        <button class="passport-tab-btn" data-tab="achievements">
-          <span>🏆 Badges (6)</span>
-        </button>
-        <button class="passport-tab-btn" data-tab="profile">
-          <span>👤 Profile &amp; Sync</span>
-        </button>
-      </div>
-
-      <div class="modal-body compact-passport-body">
-        
-        <!-- Tab 1: Passport Stamp Book -->
-        <div id="passport-tab-stamps" class="passport-tab-panel is-active">
-          <div class="stamps-mini-stats-bar">
-            <div class="mini-stat-chip">
-              <span class="mini-chip-val" id="stamps-count-total">0</span>
-              <span class="mini-chip-lbl">Parks Stamped</span>
-            </div>
-            <div class="mini-stat-chip">
-              <span class="mini-chip-val" id="stamps-acres-total">0M</span>
-              <span class="mini-chip-lbl">Acres Conquered</span>
-            </div>
-            <div class="mini-stat-chip">
-              <span class="mini-chip-val" id="stamps-xp-total">0 XP</span>
-              <span class="mini-chip-lbl">Total Experience</span>
-            </div>
+      <div class="modal-body">
+        <!-- Summary Metric Chips -->
+        <div class="journey-metrics-bar">
+          <div class="journey-metric-card">
+            <span class="journey-metric-val" id="journey-total-count">0</span>
+            <span class="journey-metric-lbl">Parks Visited</span>
           </div>
-
-          <div id="passport-stamps-grid" class="clean-stamps-grid">
-            <!-- Vintage stamps injected dynamically -->
+          <div class="journey-metric-card">
+            <span class="journey-metric-val" id="journey-total-acres">0M</span>
+            <span class="journey-metric-lbl">Acres Explored</span>
+          </div>
+          <div class="journey-metric-card">
+            <span class="journey-metric-val" id="journey-total-states">0</span>
+            <span class="journey-metric-lbl">States / Provs</span>
           </div>
         </div>
 
-        <!-- Tab 2: Curated 6 Core Badges -->
-        <div id="passport-tab-achievements" class="passport-tab-panel">
-          <div id="achievements-grid" class="clean-achievements-grid">
-            <!-- 6 streamlined badges injected dynamically -->
-          </div>
+        <!-- Visited Parks List -->
+        <div class="journey-section-header">
+          <h4>Visited Parks &amp; Journal Entries</h4>
+        </div>
+        <div id="journey-parks-list" class="journey-parks-list">
+          <!-- Populated dynamically -->
         </div>
 
-        <!-- Tab 3: Explorer Profile & Cross-Instance Sync -->
-        <div id="passport-tab-profile" class="passport-tab-panel">
-          <div class="clean-profile-grid">
-            
-            <!-- Left: Profile Editor -->
-            <div class="clean-profile-edit-box">
-              <div class="clean-profile-avatar-row">
-                <div class="clean-avatar-circle" id="profile-avatar-display">🌲</div>
-                <div class="clean-profile-name-group">
-                  <input type="text" id="profile-name-input" class="clean-name-input" value="Trail Explorer" placeholder="Explorer Name" />
-                  <span id="profile-rank-display" class="rank-title-badge">Trail Scout (Lvl 1)</span>
-                </div>
-              </div>
-
-              <!-- Avatar Quick Selector -->
-              <div class="clean-avatar-picker">
-                <button class="avatar-opt-btn" data-avatar="🌲">🌲</button>
-                <button class="avatar-opt-btn" data-avatar="🏔️">🏔️</button>
-                <button class="avatar-opt-btn" data-avatar="🦬">🦬</button>
-                <button class="avatar-opt-btn" data-avatar="🧭">🧭</button>
-                <button class="avatar-opt-btn" data-avatar="🐻">🐻</button>
-                <button class="avatar-opt-btn" data-avatar="🦅">🦅</button>
-                <button class="avatar-opt-btn" data-avatar="🐺">🐺</button>
-                <button class="avatar-opt-btn" data-avatar="🛶">🛶</button>
-                <button class="avatar-opt-btn" data-avatar="⛺">⛺</button>
-                <button class="avatar-opt-btn" data-avatar="👑">👑</button>
-              </div>
-
-              <!-- Switch Explorer Personas -->
-              <div class="clean-persona-switch-row">
-                <label for="persona-select-dropdown" class="form-label" style="margin-bottom:0;">Switch Persona:</label>
-                <select id="persona-select-dropdown" class="toolbar-select" style="flex:1;">
-                  <!-- Options injected -->
-                </select>
-              </div>
-            </div>
-
-            <!-- Right: Cross-Instance Cloud Sync & Backup -->
-            <div class="clean-sync-box">
-              <h4 class="sync-box-title">☁️ Cross-Instance Sync &amp; Backup</h4>
-              <p class="sync-box-desc">
-                Your profile is saved automatically in your browser. Use your <strong>Portable Sync Code</strong> or <strong>Passport File</strong> to restore your progress on any other phone, laptop, or browser instance instantly!
-              </p>
-
-              <div class="sync-actions-row">
-                <button id="copy-sync-code-btn" class="drawer-action-btn primary" style="flex:1; justify-content:center;">
-                  <span>📋 Copy Sync Code</span>
-                </button>
-                <button id="download-passport-btn" class="drawer-action-btn" style="flex:1; justify-content:center;">
-                  <span>💾 Download Backup</span>
-                </button>
-              </div>
-
-              <!-- Import Sync Code -->
-              <div class="sync-import-row">
-                <input type="text" id="import-sync-code-input" class="form-input" placeholder="Paste Sync Code or JSON..." style="flex:1;" />
-                <button id="import-sync-code-btn" class="drawer-action-btn primary">Restore</button>
-              </div>
-            </div>
-
+        <!-- Backup & Sync Options -->
+        <div class="journey-backup-card">
+          <div class="backup-card-info">
+            <h5>💾 Backup &amp; Device Transfer</h5>
+            <p>Save your personal travel log or copy your sync code to transfer it to another computer or phone.</p>
+          </div>
+          <div class="backup-card-actions">
+            <button id="journey-copy-sync-btn" class="drawer-action-btn primary">
+              <span>📋 Copy Sync Code</span>
+            </button>
+            <button id="journey-download-backup-btn" class="drawer-action-btn">
+              <span>💾 Download JSON</span>
+            </button>
           </div>
         </div>
-
       </div>
     </div>
 
     <!-- Log Park Visit Dialog Modal -->
     <div id="visit-modal" class="terrain-modal log-visit-modal" role="dialog" aria-modal="true" aria-label="Log Park Visit">
       <div class="modal-header">
-        <h3 class="modal-title">🌲 Stamp Park in Passport</h3>
+        <h3 class="modal-title">🌲 Record Park Visit</h3>
         <button id="visit-modal-close-btn" class="drawer-close-btn" aria-label="Close">&times;</button>
       </div>
       <div class="modal-body">
         <h4 id="visit-modal-park-name" class="visit-park-title">Yellowstone National Park</h4>
         
         <div class="visit-form-group">
-          <label for="visit-date-input" class="visit-form-label">Date Visited</label>
+          <label for="visit-date-input" class="visit-form-label">Date of Visit</label>
           <input type="date" id="visit-date-input" class="visit-input" />
         </div>
 
         <div class="visit-form-group">
-          <label class="visit-form-label">Your Personal Experience Rating</label>
-          <div class="star-rating-picker" id="visit-star-picker">
-            <button class="star-btn is-active" data-rating="1">★</button>
-            <button class="star-btn is-active" data-rating="2">★</button>
-            <button class="star-btn is-active" data-rating="3">★</button>
-            <button class="star-btn is-active" data-rating="4">★</button>
-            <button class="star-btn is-active" data-rating="5">★</button>
-          </div>
-        </div>
-
-        <div class="visit-form-group">
-          <label for="visit-notes-input" class="visit-form-label">Trip Memories & Journal Notes (+50 XP)</label>
-          <textarea id="visit-notes-input" class="visit-textarea" rows="3" placeholder="Describe your favorite hike, wildlife encounter, weather, or camping story..."></textarea>
+          <label for="visit-notes-input" class="visit-form-label">Personal Notes &amp; Trip Memories (Optional)</label>
+          <textarea id="visit-notes-input" class="visit-textarea" rows="3" placeholder="Notes on favorite trails, weather, wildlife sightings, or camping experiences..."></textarea>
         </div>
 
         <div class="visit-form-actions">
-          <button id="submit-visit-btn" class="drawer-action-btn primary" style="width: 100%; justify-content: center; padding: 12px;">
-            <span>★ Stamp My Adventure Passport (+150 XP) ★</span>
+          <button id="submit-visit-btn" class="drawer-action-btn primary" style="width: 100%; justify-content: center; padding: 10px;">
+            <span>✓ Save Visit to My Journey</span>
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Stats & Insights Modal -->
-    <div id="stats-modal" class="terrain-modal" role="dialog" aria-modal="true" aria-label="Preserved Land Stats">
+    <!-- ABOUT & CHIEF ARCHITECT MODAL (Minimalist & Focused) -->
+    <div id="about-modal" class="terrain-modal about-modal" role="dialog" aria-modal="true" aria-label="About The Terrain">
       <div class="modal-header">
-        <h3 class="modal-title">📊 North America Parks & Conservation Insights</h3>
-        <button id="stats-modal-close-btn" class="drawer-close-btn" aria-label="Close stats">&times;</button>
+        <h3 class="modal-title">About The Terrain</h3>
+        <button id="about-modal-close-btn" class="drawer-close-btn" aria-label="Close about dialog">&times;</button>
       </div>
       <div class="modal-body">
-        <div class="modal-stats-overview">
+        
+        <!-- Chief Architect Card -->
+        <div class="about-creator-card">
+          <div class="creator-avatar-circle">🌲</div>
+          <div class="creator-details">
+            <h3 class="creator-full-name">Rishi Ramchandani</h3>
+            <p class="creator-role-title">Creator &amp; Chief Architect</p>
+            <p class="creator-brief-bio">
+              Architecting interactive mapping tools that empower people to discover, appreciate, and explore the extraordinary protected state and national wilderness of the United States and Canada.
+            </p>
+            <div class="creator-social-row">
+              <a href="https://x.com/1RishiR" target="_blank" rel="noopener noreferrer" class="social-link-btn x-link" title="Follow Rishi on X (Twitter)">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                </svg>
+                <span>X (@1RishiR)</span>
+              </a>
+              <a href="https://www.linkedin.com/in/rishi-ramchandani-73a74916b/" target="_blank" rel="noopener noreferrer" class="social-link-btn linkedin-link" title="Connect on LinkedIn">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                  <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.2V10.9H6.46M7.83 6.45a1.6 1.6 0 0 0-1.6 1.6a1.6 1.6 0 0 0 1.6 1.6a1.6 1.6 0 0 0 1.6-1.6a1.6 1.6 0 0 0-1.6-1.6z"/>
+                </svg>
+                <span>LinkedIn</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Conservation Insights -->
+        <div class="about-stats-grid">
           <div class="overview-card">
             <div class="overview-num">63</div>
             <div class="overview-lbl">🇺🇸 US National Parks</div>
@@ -660,15 +424,15 @@
           </div>
           <div class="overview-card">
             <div class="overview-num">100M+</div>
-            <div class="overview-lbl">Total Preserved Acres</div>
+            <div class="overview-lbl">Preserved Acres</div>
           </div>
         </div>
 
         <div class="drawer-section">
-          <h3 class="drawer-section-title">Historic Conservation Milestones</h3>
+          <h3 class="drawer-section-title">Conservation Milestones</h3>
           <div class="insights-timeline">
             <div class="timeline-row">
-              <span><strong>Yellowstone</strong> (First National Park on Earth)</span>
+              <span><strong>Yellowstone</strong> (World's First National Park)</span>
               <span class="timeline-year">1872</span>
             </div>
             <div class="timeline-row">
@@ -680,41 +444,12 @@
               <span class="timeline-year">1885</span>
             </div>
             <div class="timeline-row">
-              <span><strong>Yosemite & Sequoia</strong> (John Muir Conservation Era)</span>
+              <span><strong>Yosemite &amp; Sequoia</strong> (John Muir Conservation Era)</span>
               <span class="timeline-year">1890</span>
-            </div>
-            <div class="timeline-row">
-              <span><strong>Adirondack Park</strong> (Largest Contiguous Park in US)</span>
-              <span class="timeline-year">1892</span>
-            </div>
-            <div class="timeline-row">
-              <span><strong>Algonquin</strong> (Ontario's Flagship Wilderness)</span>
-              <span class="timeline-year">1893</span>
             </div>
           </div>
         </div>
 
-        <div class="drawer-section">
-          <h3 class="drawer-section-title">Largest Wilderness Preserves</h3>
-          <div class="insights-timeline">
-            <div class="timeline-row">
-              <span><strong>Wrangell-St. Elias</strong> (Alaska)</span>
-              <span class="timeline-year">13.2M Acres</span>
-            </div>
-            <div class="timeline-row">
-              <span><strong>Wood Buffalo</strong> (Alberta / NWT)</span>
-              <span class="timeline-year">11.1M Acres</span>
-            </div>
-            <div class="timeline-row">
-              <span><strong>Gates of the Arctic</strong> (Brooks Range, AK)</span>
-              <span class="timeline-year">7.5M Acres</span>
-            </div>
-            <div class="timeline-row">
-              <span><strong>Adirondack Park</strong> (New York)</span>
-              <span class="timeline-year">6.0M Acres</span>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
 
