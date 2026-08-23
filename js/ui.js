@@ -1,6 +1,6 @@
 /**
  * The Terrain - UI Controller
- * Manages rendering of sidebar cards, detail drawers, wishlist modal, insights dashboard, and toast notifications.
+ * Manages sidebar cards, detail drawer, wishlist, adventure passport modal, visit logging dialog, and toasts.
  */
 
 class TerrainUI {
@@ -8,6 +8,7 @@ class TerrainUI {
     this.map = mapInstance;
     this.filter = filterInstance;
     this.activePark = null;
+    this.selectedVisitRating = 5;
 
     this.dom = {
       // Containers
@@ -15,6 +16,13 @@ class TerrainUI {
       resultsCounter: document.getElementById("results-counter"),
       emptyState: document.getElementById("empty-state"),
       
+      // Header Profile Pill
+      headerProfileBtn: document.getElementById("passport-modal-btn"),
+      headerAvatar: document.getElementById("header-avatar"),
+      headerProfileName: document.getElementById("header-profile-name"),
+      headerLevelBadge: document.getElementById("header-level-badge"),
+      headerXpBar: document.getElementById("header-xp-bar"),
+
       // Detail Drawer
       detailDrawer: document.getElementById("detail-drawer"),
       drawerOverlay: document.getElementById("drawer-overlay"),
@@ -36,7 +44,11 @@ class TerrainUI {
       drawerOfficialLink: document.getElementById("drawer-official-link"),
       drawerDirectionsLink: document.getElementById("drawer-directions-link"),
       drawerFavBtn: document.getElementById("drawer-fav-btn"),
-      drawerVisitedBtn: document.getElementById("drawer-visited-btn"),
+      drawerLogVisitBtn: document.getElementById("drawer-log-visit-btn"),
+      drawerVisitedBanner: document.getElementById("drawer-visited-stamp-banner"),
+      drawerStampDate: document.getElementById("drawer-stamp-date"),
+      drawerStampNotes: document.getElementById("drawer-stamp-notes"),
+      drawerEditVisitBtn: document.getElementById("drawer-edit-visit-btn"),
       drawerShareBtn: document.getElementById("drawer-share-btn"),
 
       // Wishlist Drawer
@@ -49,12 +61,53 @@ class TerrainUI {
       wishlistExportBtn: document.getElementById("wishlist-export-btn"),
       wishlistFilterMapBtn: document.getElementById("wishlist-filter-map-btn"),
 
-      // Insights / Stats Modal
-      statsModal: document.getElementById("stats-modal"),
-      statsModalBtn: document.getElementById("stats-modal-btn"),
-      statsModalCloseBtn: document.getElementById("stats-modal-close-btn"),
+      // Passport Modal
+      passportModal: document.getElementById("passport-modal"),
+      passportModalCloseBtn: document.getElementById("passport-modal-close-btn"),
+      passportTabBtns: document.querySelectorAll(".passport-tab-btn"),
+      passportTabPanels: document.querySelectorAll(".passport-tab-panel"),
+      
+      // Passport Stamps Tab
+      stampsCountTotal: document.getElementById("stamps-count-total"),
+      stampsAcresTotal: document.getElementById("stamps-acres-total"),
+      stampsXpTotal: document.getElementById("stamps-xp-total"),
+      passportStampsGrid: document.getElementById("passport-stamps-grid"),
 
-      // Top Filter controls
+      // Passport Achievements Tab
+      achievementsUnlockedTitle: document.getElementById("achievements-unlocked-title"),
+      achievementsGrid: document.getElementById("achievements-grid"),
+
+      // Passport Territory Tab
+      territoryUsStates: document.getElementById("territory-us-states"),
+      territoryCaProvinces: document.getElementById("territory-ca-provinces"),
+      territoryUsTags: document.getElementById("territory-us-tags"),
+      territoryCaTags: document.getElementById("territory-ca-tags"),
+      progUsNp: document.getElementById("prog-us-np"),
+      barUsNp: document.getElementById("bar-us-np"),
+      progCaNp: document.getElementById("prog-ca-np"),
+      barCaNp: document.getElementById("bar-ca-np"),
+      progSp: document.getElementById("prog-sp"),
+
+      // Passport Profile Tab
+      profileAvatarDisplay: document.getElementById("profile-avatar-display"),
+      profileNameInput: document.getElementById("profile-name-input"),
+      profileRankDisplay: document.getElementById("profile-rank-display"),
+      profileJoinedDate: document.getElementById("profile-joined-date"),
+      avatarOptBtns: document.querySelectorAll(".avatar-opt-btn"),
+      profilesListContainer: document.getElementById("profiles-list-container"),
+      newProfileNameInput: document.getElementById("new-profile-name-input"),
+      addProfileBtn: document.getElementById("add-profile-btn"),
+
+      // Log Visit Modal
+      visitModal: document.getElementById("visit-modal"),
+      visitModalCloseBtn: document.getElementById("visit-modal-close-btn"),
+      visitModalParkName: document.getElementById("visit-modal-park-name"),
+      visitDateInput: document.getElementById("visit-date-input"),
+      visitStarPicker: document.getElementById("visit-star-picker"),
+      visitNotesInput: document.getElementById("visit-notes-input"),
+      submitVisitBtn: document.getElementById("submit-visit-btn"),
+
+      // Toolbar Controls
       modeToggles: document.querySelectorAll("[data-mode-toggle]"),
       countryToggles: document.querySelectorAll("[data-country-toggle]"),
       regionSelect: document.getElementById("region-select"),
@@ -66,9 +119,14 @@ class TerrainUI {
       resetFiltersBtn: document.getElementById("reset-filters-btn"),
       fitBoundsBtn: document.getElementById("fit-bounds-btn"),
       recenterBtn: document.getElementById("recenter-btn"),
-
-      // Basemap Dropdown
+      filterVisitedToggleBtn: document.getElementById("filter-visited-toggle-btn"),
+      filterVisitedCount: document.getElementById("filter-visited-count"),
       basemapSelect: document.getElementById("basemap-select"),
+
+      // Insights Modal
+      statsModal: document.getElementById("stats-modal"),
+      statsModalBtn: document.getElementById("stats-modal-btn"),
+      statsModalCloseBtn: document.getElementById("stats-modal-close-btn"),
 
       // Toast container
       toastContainer: document.getElementById("toast-container")
@@ -78,41 +136,51 @@ class TerrainUI {
     this.renderTagPills();
     this.updateRegionDropdown();
     this.updateWishlistCount();
+    this.updateHeaderProfile();
+    this.updateVisitedCounter();
   }
 
   initEventListeners() {
-    // Mode toggles (All / National / State)
+    // Mode toggles
     this.dom.modeToggles.forEach(btn => {
       btn.addEventListener("click", () => {
         this.dom.modeToggles.forEach(b => b.classList.remove("is-active"));
         btn.classList.add("is-active");
-        const mode = btn.getAttribute("data-mode-toggle");
-        this.filter.setMode(mode);
+        this.filter.setMode(btn.getAttribute("data-mode-toggle"));
       });
     });
 
-    // Country toggles (All / US / CA)
+    // Country toggles
     this.dom.countryToggles.forEach(btn => {
       btn.addEventListener("click", () => {
         this.dom.countryToggles.forEach(b => b.classList.remove("is-active"));
         btn.classList.add("is-active");
-        const country = btn.getAttribute("data-country-toggle");
-        this.filter.setCountry(country);
+        this.filter.setCountry(btn.getAttribute("data-country-toggle"));
         this.updateRegionDropdown();
       });
     });
 
-    // Region Select Dropdown
+    // Region Select
     if (this.dom.regionSelect) {
       this.dom.regionSelect.addEventListener("change", (e) => {
         this.filter.setStateProvince(e.target.value);
       });
     }
 
-    // Sort Select Dropdown
+    // Sort Select
     if (this.dom.sortSelect) {
       this.dom.sortSelect.addEventListener("change", (e) => {
         this.filter.setSortBy(e.target.value);
+      });
+    }
+
+    // Visited-Only Filter Toggle
+    if (this.dom.filterVisitedToggleBtn) {
+      this.dom.filterVisitedToggleBtn.addEventListener("click", () => {
+        const isVisitedOnly = !this.filter.state.visitedOnly;
+        this.filter.setVisitedOnly(isVisitedOnly);
+        this.dom.filterVisitedToggleBtn.classList.toggle("is-active", isVisitedOnly);
+        this.showToast(isVisitedOnly ? "Showing only visited & stamped parks" : "Showing all parks", "info");
       });
     }
 
@@ -131,7 +199,7 @@ class TerrainUI {
       });
     }
 
-    // Search Clear Button
+    // Search Clear
     if (this.dom.searchClearBtn) {
       this.dom.searchClearBtn.addEventListener("click", () => {
         this.dom.searchInput.value = "";
@@ -140,30 +208,22 @@ class TerrainUI {
       });
     }
 
-    // Reset Filters Button
+    // Reset Filters
     if (this.dom.resetFiltersBtn) {
-      this.dom.resetFiltersBtn.addEventListener("click", () => {
-        this.resetUIFilters();
-      });
+      this.dom.resetFiltersBtn.addEventListener("click", () => this.resetUIFilters());
     }
 
-    // Surprise Me Button
+    // Surprise Me
     if (this.dom.surpriseBtn) {
-      this.dom.surpriseBtn.addEventListener("click", () => {
-        this.triggerSurpriseMe();
-      });
+      this.dom.surpriseBtn.addEventListener("click", () => this.triggerSurpriseMe());
     }
 
     // Fit Bounds & Recenter
     if (this.dom.fitBoundsBtn) {
-      this.dom.fitBoundsBtn.addEventListener("click", () => {
-        this.map.fitBoundsToVisible();
-      });
+      this.dom.fitBoundsBtn.addEventListener("click", () => this.map.fitBoundsToVisible());
     }
     if (this.dom.recenterBtn) {
-      this.dom.recenterBtn.addEventListener("click", () => {
-        this.map.recenter();
-      });
+      this.dom.recenterBtn.addEventListener("click", () => this.map.recenter());
     }
 
     // Basemap Select
@@ -183,17 +243,20 @@ class TerrainUI {
       this.dom.drawerOverlay.addEventListener("click", () => {
         this.closeDrawer();
         this.closeWishlist();
+        this.closePassportModal();
+        this.closeVisitModal();
         this.closeStatsModal();
       });
     }
 
-    // Detail Drawer Actions
+    // Drawer Bookmark Action
     if (this.dom.drawerFavBtn) {
       this.dom.drawerFavBtn.addEventListener("click", () => {
         if (!this.activePark) return;
         const isFav = window.storage.toggleFavorite(this.activePark.id);
         this.updateDrawerFavState(isFav);
         this.updateWishlistCount();
+        this.updateHeaderProfile();
         this.renderWishlist();
         this.renderParksList(this.filter.getFilteredData());
         this.showToast(
@@ -203,18 +266,21 @@ class TerrainUI {
       });
     }
 
-    if (this.dom.drawerVisitedBtn) {
-      this.dom.drawerVisitedBtn.addEventListener("click", () => {
+    // Drawer Log Visit Action
+    if (this.dom.drawerLogVisitBtn) {
+      this.dom.drawerLogVisitBtn.addEventListener("click", () => {
         if (!this.activePark) return;
-        const isVisited = window.storage.toggleVisited(this.activePark.id);
-        this.updateDrawerVisitedState(isVisited);
-        this.showToast(
-          isVisited ? `Marked ${this.activePark.name} as visited! 🎉` : `Unmarked ${this.activePark.name}.`,
-          "success"
-        );
+        this.openVisitModal(this.activePark);
+      });
+    }
+    if (this.dom.drawerEditVisitBtn) {
+      this.dom.drawerEditVisitBtn.addEventListener("click", () => {
+        if (!this.activePark) return;
+        this.openVisitModal(this.activePark);
       });
     }
 
+    // Share & Copy Coords
     if (this.dom.drawerShareBtn) {
       this.dom.drawerShareBtn.addEventListener("click", () => {
         if (!this.activePark) return;
@@ -234,9 +300,10 @@ class TerrainUI {
     }
     if (this.dom.wishlistClearBtn) {
       this.dom.wishlistClearBtn.addEventListener("click", () => {
-        if (confirm("Are you sure you want to clear your saved park wishlist?")) {
+        if (confirm("Clear your saved park wishlist?")) {
           window.storage.clearFavorites();
           this.updateWishlistCount();
+          this.updateHeaderProfile();
           this.renderWishlist();
           this.renderParksList(this.filter.getFilteredData());
           this.showToast("Wishlist cleared.", "info");
@@ -248,11 +315,89 @@ class TerrainUI {
         const isFavOnly = !this.filter.state.favoritesOnly;
         this.filter.setFavoritesOnly(isFavOnly);
         this.closeWishlist();
-        this.showToast(isFavOnly ? "Showing only saved Wishlist parks on map" : "Showing all parks", "info");
+        this.showToast(isFavOnly ? "Showing only Wishlist parks on map" : "Showing all parks", "info");
       });
     }
     if (this.dom.wishlistExportBtn) {
       this.dom.wishlistExportBtn.addEventListener("click", () => this.exportWishlist());
+    }
+
+    // Passport & Profile Modal Toggles
+    if (this.dom.headerProfileBtn) {
+      this.dom.headerProfileBtn.addEventListener("click", () => this.openPassportModal());
+    }
+    if (this.dom.passportModalCloseBtn) {
+      this.dom.passportModalCloseBtn.addEventListener("click", () => this.closePassportModal());
+    }
+
+    // Passport Tabs Switching
+    this.dom.passportTabBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const tab = btn.getAttribute("data-tab");
+        this.switchPassportTab(tab);
+      });
+    });
+
+    // Profile Settings Event Handlers
+    if (this.dom.profileNameInput) {
+      this.dom.profileNameInput.addEventListener("change", (e) => {
+        window.storage.updateActiveProfile({ name: e.target.value });
+        this.updateHeaderProfile();
+        this.renderProfilesList();
+        this.showToast("Profile name updated!", "success");
+      });
+    }
+
+    this.dom.avatarOptBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const av = btn.getAttribute("data-avatar");
+        window.storage.updateActiveProfile({ avatar: av });
+        if (this.dom.profileAvatarDisplay) this.dom.profileAvatarDisplay.textContent = av;
+        this.updateHeaderProfile();
+        this.renderProfilesList();
+        this.showToast(`Avatar changed to ${av}!`, "success");
+      });
+    });
+
+    if (this.dom.addProfileBtn) {
+      this.dom.addProfileBtn.addEventListener("click", () => {
+        const name = this.dom.newProfileNameInput.value;
+        if (!name.trim()) return;
+        const newProf = window.storage.createProfile(name);
+        this.dom.newProfileNameInput.value = "";
+        this.updateHeaderProfile();
+        this.renderPassportModalContent();
+        this.renderParksList(this.filter.getFilteredData());
+        this.map.updateParks(this.filter.getFilteredData());
+        this.showToast(`Welcome explorer: ${newProf.name}!`, "success");
+      });
+    }
+
+    // Visit Modal Event Handlers
+    if (this.dom.visitModalCloseBtn) {
+      this.dom.visitModalCloseBtn.addEventListener("click", () => this.closeVisitModal());
+    }
+
+    // Star Rating Picker
+    if (this.dom.visitStarPicker) {
+      const starBtns = this.dom.visitStarPicker.querySelectorAll(".star-btn");
+      starBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+          const rating = parseInt(btn.getAttribute("data-rating"), 10);
+          this.selectedVisitRating = rating;
+          starBtns.forEach(b => {
+            const r = parseInt(b.getAttribute("data-rating"), 10);
+            b.classList.toggle("is-active", r <= rating);
+          });
+        });
+      });
+    }
+
+    // Submit Visit Form
+    if (this.dom.submitVisitBtn) {
+      this.dom.submitVisitBtn.addEventListener("click", () => {
+        this.submitVisitLog();
+      });
     }
 
     // Stats / Insights Modal
@@ -263,14 +408,16 @@ class TerrainUI {
       this.dom.statsModalCloseBtn.addEventListener("click", () => this.closeStatsModal());
     }
 
-    // Keyboard navigation (Escape to close modals/drawers, '/' to focus search)
+    // Global Keybindings
     window.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
         this.closeDrawer();
         this.closeWishlist();
+        this.closePassportModal();
+        this.closeVisitModal();
         this.closeStatsModal();
       }
-      if (e.key === "/" && document.activeElement !== this.dom.searchInput) {
+      if (e.key === "/" && document.activeElement !== this.dom.searchInput && !document.activeElement.matches("input, textarea")) {
         e.preventDefault();
         this.dom.searchInput?.focus();
       }
@@ -288,11 +435,44 @@ class TerrainUI {
     });
 
     // Filter Event Subscriptions
-    this.filter.subscribe((filteredParks, filterState) => {
+    this.filter.subscribe((filteredParks) => {
       this.map.updateParks(filteredParks);
       this.renderParksList(filteredParks);
       this.updateCounter(filteredParks.length);
     });
+
+    // Storage Event Subscriptions
+    window.storage.subscribe((event, data) => {
+      this.updateHeaderProfile();
+      this.updateVisitedCounter();
+      if (event === "visit_logged" || event === "visit_removed" || event === "profile_changed") {
+        this.map.updateParks(this.filter.getFilteredData());
+        this.renderParksList(this.filter.getFilteredData());
+        if (this.activePark) {
+          this.updateDrawerVisitedBanner(this.activePark.id);
+        }
+      }
+    });
+  }
+
+  // Update Header Profile Info & XP Bar
+  updateHeaderProfile() {
+    const profile = window.storage.getActiveProfile();
+    if (!profile || !window.passport) return;
+
+    const progress = window.passport.getProfileProgress(profile);
+
+    if (this.dom.headerAvatar) this.dom.headerAvatar.textContent = profile.avatar || "🌲";
+    if (this.dom.headerProfileName) this.dom.headerProfileName.textContent = profile.name || "Explorer";
+    if (this.dom.headerLevelBadge) this.dom.headerLevelBadge.textContent = `Lvl ${progress.level}`;
+    if (this.dom.headerXpBar) this.dom.headerXpBar.style.width = `${progress.progressPercent}%`;
+  }
+
+  updateVisitedCounter() {
+    const visitedCount = window.storage.getVisitedList().length;
+    if (this.dom.filterVisitedCount) {
+      this.dom.filterVisitedCount.textContent = visitedCount;
+    }
   }
 
   // Render list of parks in sidebar
@@ -314,6 +494,7 @@ class TerrainUI {
 
       const isFav = window.storage.isFavorite(park.id);
       const isVisited = window.storage.isVisited(park.id);
+      const visitData = isVisited ? window.storage.getVisitDetails(park.id) : null;
       const flag = park.country === "US" ? "🇺🇸" : "🇨🇦";
       const typeLabel = park.type === "national" ? "National Park" : "State / Provincial";
       const badgeClass = park.type === "national" ? "badge-national" : "badge-state";
@@ -326,7 +507,7 @@ class TerrainUI {
               <path d="M19 21l-7-5l-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
             </svg>
           </button>
-          ${isVisited ? `<span class="park-visited-badge" title="Visited">✓ Visited</span>` : ""}
+          ${isVisited ? `<span class="park-visited-badge" title="Stamped in Passport: ${visitData?.date || 'Visited'}">★ Stamped</span>` : ""}
         </div>
         <div class="park-card-content">
           <div class="park-card-header">
@@ -341,14 +522,11 @@ class TerrainUI {
         </div>
       `;
 
-      // Card click
       card.addEventListener("click", (e) => {
-        // Ignore bookmark button click
         if (e.target.closest(".park-card-bookmark-btn")) return;
         this.map.selectPark(park.id);
       });
 
-      // Bookmark button click inside card
       const bookmarkBtn = card.querySelector(".park-card-bookmark-btn");
       bookmarkBtn.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -356,6 +534,7 @@ class TerrainUI {
         bookmarkBtn.classList.toggle("is-active", fav);
         bookmarkBtn.querySelector("svg").setAttribute("fill", fav ? "#f59e0b" : "none");
         this.updateWishlistCount();
+        this.updateHeaderProfile();
         this.renderWishlist();
         if (this.activePark && this.activePark.id === park.id) {
           this.updateDrawerFavState(fav);
@@ -388,40 +567,31 @@ class TerrainUI {
     if (this.dom.drawerStatVisitors) this.dom.drawerStatVisitors.textContent = park.annualVisitors || "N/A";
     if (this.dom.drawerStatCoords) this.dom.drawerStatCoords.textContent = `${park.coordinates[0].toFixed(2)}°N, ${Math.abs(park.coordinates[1]).toFixed(2)}°W`;
 
-    // Content
     if (this.dom.drawerDesc) this.dom.drawerDesc.textContent = park.description;
     
-    // Highlights
     if (this.dom.drawerHighlights) {
       this.dom.drawerHighlights.innerHTML = (park.highlights || [])
         .map(h => `<li class="highlight-item"><span class="highlight-bullet">✦</span> ${h}</li>`)
         .join("");
     }
 
-    // Tags
     if (this.dom.drawerTags) {
       this.dom.drawerTags.innerHTML = (park.tags || [])
         .map(t => `<span class="drawer-tag-pill">${t}</span>`)
         .join("");
     }
 
-    // Climate & Season
     if (this.dom.drawerBestSeason) this.dom.drawerBestSeason.textContent = park.bestSeason || "Year-round";
     if (this.dom.drawerClimate) this.dom.drawerClimate.textContent = park.climate || "Varies by season";
 
-    // Links
-    if (this.dom.drawerOfficialLink) {
-      this.dom.drawerOfficialLink.href = park.officialUrl || "#";
-    }
+    if (this.dom.drawerOfficialLink) this.dom.drawerOfficialLink.href = park.officialUrl || "#";
     if (this.dom.drawerDirectionsLink) {
       this.dom.drawerDirectionsLink.href = `https://www.google.com/maps/dir/?api=1&destination=${park.coordinates[0]},${park.coordinates[1]}`;
     }
 
-    // Favorite & Visited button states
     this.updateDrawerFavState(window.storage.isFavorite(park.id));
-    this.updateDrawerVisitedState(window.storage.isVisited(park.id));
+    this.updateDrawerVisitedBanner(park.id);
 
-    // Show Drawer
     this.dom.detailDrawer?.classList.add("is-open");
     this.dom.drawerOverlay?.classList.add("is-open");
   }
@@ -436,22 +606,36 @@ class TerrainUI {
     if (!this.dom.drawerFavBtn) return;
     this.dom.drawerFavBtn.classList.toggle("is-active", isFav);
     this.dom.drawerFavBtn.innerHTML = `
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="${isFav ? "#f59e0b" : "none"}" stroke="currentColor" stroke-width="2">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="${isFav ? "#f59e0b" : "none"}" stroke="currentColor" stroke-width="2">
         <path d="M19 21l-7-5l-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
       </svg>
-      <span>${isFav ? "Saved to Wishlist" : "Add to Wishlist"}</span>
+      <span>${isFav ? "In Wishlist" : "Wishlist"}</span>
     `;
   }
 
-  updateDrawerVisitedState(isVisited) {
-    if (!this.dom.drawerVisitedBtn) return;
-    this.dom.drawerVisitedBtn.classList.toggle("is-active", isVisited);
-    this.dom.drawerVisitedBtn.innerHTML = `
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M20 6L9 17l-5-5"></path>
-      </svg>
-      <span>${isVisited ? "Visited ✓" : "Mark Visited"}</span>
-    `;
+  updateDrawerVisitedBanner(parkId) {
+    const isVisited = window.storage.isVisited(parkId);
+    const visitData = window.storage.getVisitDetails(parkId);
+
+    if (this.dom.drawerVisitedBanner) {
+      this.dom.drawerVisitedBanner.style.display = isVisited ? "flex" : "none";
+    }
+
+    if (this.dom.drawerLogVisitBtn) {
+      this.dom.drawerLogVisitBtn.innerHTML = isVisited
+        ? `<span>✓ Stamped in Passport</span>`
+        : `<span>🌲 Stamp in Passport</span>`;
+      this.dom.drawerLogVisitBtn.classList.toggle("primary", !isVisited);
+    }
+
+    if (isVisited && visitData) {
+      if (this.dom.drawerStampDate) {
+        this.dom.drawerStampDate.textContent = `★ Stamped on ${visitData.date} (${"★".repeat(visitData.rating || 5)})`;
+      }
+      if (this.dom.drawerStampNotes) {
+        this.dom.drawerStampNotes.textContent = visitData.notes ? `"${visitData.notes}"` : "No journal notes added.";
+      }
+    }
   }
 
   highlightActiveCard(parkId) {
@@ -470,7 +654,7 @@ class TerrainUI {
     if (!this.dom.tagPillsContainer) return;
     this.dom.tagPillsContainer.innerHTML = "";
 
-    const tags = this.filter.getAllTags().slice(0, 14); // Top 14 popular tags
+    const tags = this.filter.getAllTags().slice(0, 14);
 
     tags.forEach(({ tag, count }) => {
       const pill = document.createElement("button");
@@ -487,7 +671,6 @@ class TerrainUI {
     });
   }
 
-  // Update Region (State/Province) Dropdown
   updateRegionDropdown() {
     if (!this.dom.regionSelect) return;
     const regions = this.filter.getAvailableRegions();
@@ -508,7 +691,6 @@ class TerrainUI {
     }
   }
 
-  // Update result count banner
   updateCounter(count) {
     if (this.dom.resultsCounter) {
       const mode = this.filter.state.mode;
@@ -517,7 +699,6 @@ class TerrainUI {
     }
   }
 
-  // Surprise Me / Random Park Discovery
   triggerSurpriseMe() {
     const data = this.filter.getFilteredData();
     const pool = data.length > 0 ? data : this.filter.allData;
@@ -528,11 +709,11 @@ class TerrainUI {
     this.showToast(`🎲 Discovered: ${randomPark.name}!`, "success");
   }
 
-  // Reset Filters
   resetUIFilters() {
     this.filter.resetAll();
     this.dom.modeToggles.forEach(b => b.classList.toggle("is-active", b.getAttribute("data-mode-toggle") === "all"));
     this.dom.countryToggles.forEach(b => b.classList.toggle("is-active", b.getAttribute("data-country-toggle") === "all"));
+    if (this.dom.filterVisitedToggleBtn) this.dom.filterVisitedToggleBtn.classList.remove("is-active");
     if (this.dom.regionSelect) this.dom.regionSelect.value = "all";
     if (this.dom.sortSelect) this.dom.sortSelect.value = "featured";
     if (this.dom.searchInput) {
@@ -544,7 +725,245 @@ class TerrainUI {
     this.showToast("All filters reset", "info");
   }
 
-  // Wishlist / Bucket List Drawer
+  // ==========================================
+  // --- Log Park Visit Dialog ---
+  // ==========================================
+  openVisitModal(park) {
+    this.activePark = park;
+    const existing = window.storage.getVisitDetails(park.id);
+
+    if (this.dom.visitModalParkName) this.dom.visitModalParkName.textContent = park.name;
+    if (this.dom.visitDateInput) {
+      this.dom.visitDateInput.value = existing?.date || new Date().toISOString().split("T")[0];
+    }
+    if (this.dom.visitNotesInput) {
+      this.dom.visitNotesInput.value = existing?.notes || "";
+    }
+
+    const rating = existing?.rating || 5;
+    this.selectedVisitRating = rating;
+    if (this.dom.visitStarPicker) {
+      const starBtns = this.dom.visitStarPicker.querySelectorAll(".star-btn");
+      starBtns.forEach(b => {
+        const r = parseInt(b.getAttribute("data-rating"), 10);
+        b.classList.toggle("is-active", r <= rating);
+      });
+    }
+
+    this.dom.visitModal?.classList.add("is-open");
+    this.dom.drawerOverlay?.classList.add("is-open");
+  }
+
+  closeVisitModal() {
+    this.dom.visitModal?.classList.remove("is-open");
+    if (!this.dom.detailDrawer?.classList.contains("is-open") &&
+        !this.dom.wishlistDrawer?.classList.contains("is-open") &&
+        !this.dom.passportModal?.classList.contains("is-open") &&
+        !this.dom.statsModal?.classList.contains("is-open")) {
+      this.dom.drawerOverlay?.classList.remove("is-open");
+    }
+  }
+
+  submitVisitLog() {
+    if (!this.activePark) return;
+
+    const date = this.dom.visitDateInput.value;
+    const rating = this.selectedVisitRating;
+    const notes = this.dom.visitNotesInput.value;
+
+    const entry = window.storage.logVisit(this.activePark.id, { date, rating, notes });
+    this.closeVisitModal();
+
+    this.updateHeaderProfile();
+    this.updateVisitedCounter();
+    this.updateDrawerVisitedBanner(this.activePark.id);
+    this.renderParksList(this.filter.getFilteredData());
+    this.map.updateParks(this.filter.getFilteredData());
+
+    this.showToast(`🎉 Stamped ${this.activePark.name} in your Adventure Passport! (+150 XP)`, "success");
+  }
+
+  // ==========================================
+  // --- Passport & Profiles Modal ---
+  // ==========================================
+  openPassportModal() {
+    this.renderPassportModalContent();
+    this.dom.passportModal?.classList.add("is-open");
+    this.dom.drawerOverlay?.classList.add("is-open");
+  }
+
+  closePassportModal() {
+    this.dom.passportModal?.classList.remove("is-open");
+    this.dom.drawerOverlay?.classList.remove("is-open");
+  }
+
+  switchPassportTab(tabName) {
+    this.dom.passportTabBtns.forEach(btn => {
+      btn.classList.toggle("is-active", btn.getAttribute("data-tab") === tabName);
+    });
+
+    this.dom.passportTabPanels.forEach(panel => {
+      panel.classList.toggle("is-active", panel.id === `passport-tab-${tabName}`);
+    });
+  }
+
+  renderPassportModalContent() {
+    if (!window.passport) return;
+
+    const profile = window.storage.getActiveProfile();
+    const progress = window.passport.getProfileProgress(profile);
+    const visitedParks = window.passport.getVisitedParkObjects();
+    const stats = window.passport.getTravelStats();
+
+    // Tab 1: Stamps Overview
+    if (this.dom.stampsCountTotal) this.dom.stampsCountTotal.textContent = stats.totalVisited;
+    if (this.dom.stampsAcresTotal) this.dom.stampsAcresTotal.textContent = `${(stats.totalAcreage / 1000000).toFixed(1)}M`;
+    if (this.dom.stampsXpTotal) this.dom.stampsXpTotal.textContent = `${progress.xp.toLocaleString()} XP`;
+
+    // Render Stamps Grid
+    if (this.dom.passportStampsGrid) {
+      if (visitedParks.length === 0) {
+        this.dom.passportStampsGrid.innerHTML = `
+          <div class="wishlist-empty" style="grid-column: 1 / -1;">
+            <div class="wishlist-empty-icon">📔</div>
+            <h4>No Passport Stamps Yet</h4>
+            <p>Click "Stamp in Passport" on any park you have visited to collect vintage cancellation stamps and earn Explorer XP!</p>
+          </div>
+        `;
+      } else {
+        this.dom.passportStampsGrid.innerHTML = visitedParks.map(park => {
+          const stampSvg = window.passport.generateStampSvg(park, park.visitData);
+          const stars = "★".repeat(park.visitData?.rating || 5);
+          return `
+            <div class="passport-stamp-card" data-stamp-id="${park.id}">
+              ${stampSvg}
+              <div class="stamp-card-stars">${stars}</div>
+              ${park.visitData?.notes ? `<p class="stamp-card-notes">"${park.visitData.notes}"</p>` : ""}
+            </div>
+          `;
+        }).join("");
+
+        // Click stamp card to jump to park on map
+        this.dom.passportStampsGrid.querySelectorAll(".passport-stamp-card").forEach(card => {
+          card.addEventListener("click", () => {
+            const id = card.getAttribute("data-stamp-id");
+            this.closePassportModal();
+            this.map.selectPark(id);
+          });
+        });
+      }
+    }
+
+    // Tab 2: Achievements
+    const achievements = window.passport.getAllAchievementsStatus();
+    const unlockedCount = achievements.filter(a => a.isUnlocked).length;
+    if (this.dom.achievementsUnlockedTitle) {
+      this.dom.achievementsUnlockedTitle.textContent = `Unlocked ${unlockedCount} / ${achievements.length} Badges`;
+    }
+
+    if (this.dom.achievementsGrid) {
+      this.dom.achievementsGrid.innerHTML = achievements.map(ach => `
+        <div class="achievement-card ${ach.isUnlocked ? "is-unlocked" : ""}">
+          <div class="ach-header">
+            <span class="ach-icon">${ach.icon}</span>
+            <span class="ach-xp-badge">+${ach.xp} XP</span>
+          </div>
+          <h4 class="ach-title">${ach.title} ${ach.isUnlocked ? "✓" : ""}</h4>
+          <p class="ach-desc">${ach.desc}</p>
+          <div class="ach-progress-bar-wrap">
+            <div class="ach-progress-bar-fill" style="width: ${(ach.progress.current / ach.progress.target) * 100}%;"></div>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    // Tab 3: Travel Territory
+    if (this.dom.territoryUsStates) this.dom.territoryUsStates.textContent = `${stats.visitedUSStatesCount} / 50`;
+    if (this.dom.territoryCaProvinces) this.dom.territoryCaProvinces.textContent = `${stats.visitedCAProvincesCount} / 13`;
+
+    if (this.dom.territoryUsTags) {
+      this.dom.territoryUsTags.innerHTML = stats.visitedUSStatesList.length > 0
+        ? stats.visitedUSStatesList.map(s => `<span class="territory-pill">${s}</span>`).join("")
+        : `<span style="font-size:0.75rem; color:var(--text-muted);">No US states stamped yet</span>`;
+    }
+
+    if (this.dom.territoryCaTags) {
+      this.dom.territoryCaTags.innerHTML = stats.visitedCAProvincesList.length > 0
+        ? stats.visitedCAProvincesList.map(p => `<span class="territory-pill">${p}</span>`).join("")
+        : `<span style="font-size:0.75rem; color:var(--text-muted);">No Canadian provinces stamped yet</span>`;
+    }
+
+    // Progress Bars
+    const usNpPercent = Math.min(100, Math.round((stats.usNationalVisited / 63) * 100));
+    if (this.dom.progUsNp) this.dom.progUsNp.textContent = `${stats.usNationalVisited} / 63 (${usNpPercent}%)`;
+    if (this.dom.barUsNp) this.dom.barUsNp.style.width = `${usNpPercent}%`;
+
+    const caNpPercent = Math.min(100, Math.round((stats.caNationalVisited / 48) * 100));
+    if (this.dom.progCaNp) this.dom.progCaNp.textContent = `${stats.caNationalVisited} / 48 (${caNpPercent}%)`;
+    if (this.dom.barCaNp) this.dom.barCaNp.style.width = `${caNpPercent}%`;
+
+    if (this.dom.progSp) this.dom.progSp.textContent = `${stats.stateParksVisited} Preserves Logged`;
+
+    // Tab 4: Profile Settings
+    if (this.dom.profileAvatarDisplay) this.dom.profileAvatarDisplay.textContent = profile.avatar || "🌲";
+    if (this.dom.profileNameInput) this.dom.profileNameInput.value = profile.name || "Trail Explorer";
+    if (this.dom.profileRankDisplay) this.dom.profileRankDisplay.textContent = `${progress.rank.title} (Lvl ${progress.level})`;
+
+    this.renderProfilesList();
+  }
+
+  renderProfilesList() {
+    if (!this.dom.profilesListContainer) return;
+    const profiles = window.storage.getProfiles();
+    const activeProf = window.storage.getActiveProfile();
+
+    this.dom.profilesListContainer.innerHTML = profiles.map(p => {
+      const isActive = p.id === activeProf.id;
+      const visitedCount = Object.keys(p.visited || {}).length;
+      return `
+        <div class="profile-item-row ${isActive ? "is-active" : ""}" data-profile-id="${p.id}">
+          <div class="profile-item-left">
+            <span class="profile-item-avatar">${p.avatar || "🌲"}</span>
+            <div>
+              <div class="profile-item-name">${p.name} ${isActive ? " (Active)" : ""}</div>
+              <div class="profile-item-badge">${visitedCount} Stamped Parks &bull; ${(p.favorites || []).length} Saved</div>
+            </div>
+          </div>
+          ${!isActive && profiles.length > 1 ? `<button class="wishlist-item-del-btn" data-action="del-profile" data-id="${p.id}" title="Delete Persona">🗑️</button>` : ""}
+        </div>
+      `;
+    }).join("");
+
+    // Bind profile clicks
+    this.dom.profilesListContainer.querySelectorAll(".profile-item-row").forEach(row => {
+      row.addEventListener("click", (e) => {
+        if (e.target.closest("[data-action='del-profile']")) return;
+        const id = row.getAttribute("data-profile-id");
+        window.storage.setActiveProfile(id);
+        this.updateHeaderProfile();
+        this.renderPassportModalContent();
+        this.renderParksList(this.filter.getFilteredData());
+        this.map.updateParks(this.filter.getFilteredData());
+        this.showToast(`Switched to explorer: ${window.storage.getActiveProfile().name}`, "info");
+      });
+    });
+
+    this.dom.profilesListContainer.querySelectorAll("[data-action='del-profile']").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const id = btn.getAttribute("data-id");
+        if (confirm("Delete this explorer persona?")) {
+          window.storage.deleteProfile(id);
+          this.updateHeaderProfile();
+          this.renderPassportModalContent();
+          this.renderParksList(this.filter.getFilteredData());
+          this.map.updateParks(this.filter.getFilteredData());
+        }
+      });
+    });
+  }
+
+  // Wishlist
   openWishlist() {
     this.renderWishlist();
     this.dom.wishlistDrawer?.classList.add("is-open");
@@ -594,7 +1013,6 @@ class TerrainUI {
       </div>
     `).join("");
 
-    // Bind item actions
     this.dom.wishlistList.querySelectorAll("[data-action='view']").forEach(btn => {
       btn.addEventListener("click", () => {
         const id = btn.getAttribute("data-id");
@@ -608,6 +1026,7 @@ class TerrainUI {
         const id = btn.getAttribute("data-id");
         window.storage.toggleFavorite(id);
         this.updateWishlistCount();
+        this.updateHeaderProfile();
         this.renderWishlist();
         this.renderParksList(this.filter.getFilteredData());
       });
@@ -654,7 +1073,7 @@ class TerrainUI {
     setTimeout(() => {
       toast.classList.remove("is-visible");
       setTimeout(() => toast.remove(), 300);
-    }, 3200);
+    }, 3400);
   }
 }
 

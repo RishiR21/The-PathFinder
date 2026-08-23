@@ -72,8 +72,22 @@
         </div>
       </div>
 
-      <!-- Header Action Buttons -->
+      <!-- Header Action Buttons & Explorer Profile -->
       <div class="header-actions">
+        <!-- Explorer Passport & Level Button -->
+        <button id="passport-modal-btn" class="header-profile-btn" title="Open My Adventure Passport & Profile">
+          <div class="profile-avatar-badge" id="header-avatar">🌲</div>
+          <div class="profile-info-pill">
+            <div class="profile-top-line">
+              <span id="header-profile-name" class="profile-name">Trail Explorer</span>
+              <span id="header-level-badge" class="level-badge">Lvl 1</span>
+            </div>
+            <div class="profile-xp-bar-wrap">
+              <div id="header-xp-bar" class="profile-xp-bar" style="width: 15%;"></div>
+            </div>
+          </div>
+        </button>
+
         <button id="surprise-me-btn" class="header-action-btn" title="Discover a Random Park">
           <span>🎲 Surprise Me</span>
         </button>
@@ -107,6 +121,12 @@
           <option value="area-desc">📐 Largest Area First</option>
           <option value="rating-desc">⭐ Highest Rated</option>
         </select>
+
+        <!-- Visited-Only Quick Filter Pill -->
+        <button id="filter-visited-toggle-btn" class="filter-tag-pill visited-filter-pill" title="Filter to show only parks you've stamped as visited">
+          <span>✓ Stamped in Passport</span>
+          <span id="filter-visited-count" class="tag-count">0</span>
+        </button>
 
         <!-- Basemap Style Selector -->
         <select id="basemap-select" class="toolbar-select" aria-label="Select Basemap Style">
@@ -183,25 +203,32 @@
       <div class="drawer-body">
         <!-- Action Buttons -->
         <div class="drawer-action-bar">
-          <a id="drawer-official-link" href="#" target="_blank" rel="noopener noreferrer" class="drawer-action-btn primary">
-            <span>Official Website</span>
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+          <button id="drawer-log-visit-btn" class="drawer-action-btn primary highlight-pulse">
+            <span>🌲 Stamp in Passport</span>
+          </button>
+          <button id="drawer-fav-btn" class="drawer-action-btn">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5l-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+            <span>Wishlist</span>
+          </button>
+          <a id="drawer-official-link" href="#" target="_blank" rel="noopener noreferrer" class="drawer-action-btn">
+            <span>Official Site ↗</span>
           </a>
           <a id="drawer-directions-link" href="#" target="_blank" rel="noopener noreferrer" class="drawer-action-btn">
             <span>Directions</span>
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
           </a>
-          <button id="drawer-fav-btn" class="drawer-action-btn">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5l-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
-            <span>Add to Wishlist</span>
-          </button>
-          <button id="drawer-visited-btn" class="drawer-action-btn">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"></path></svg>
-            <span>Mark Visited</span>
-          </button>
           <button id="drawer-share-btn" class="drawer-action-btn" title="Copy coordinates & share link">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
           </button>
+        </div>
+
+        <!-- Visited Stamp Banner (if visited) -->
+        <div id="drawer-visited-stamp-banner" class="drawer-visited-stamp-banner" style="display: none;">
+          <div class="stamp-banner-icon">★</div>
+          <div class="stamp-banner-info">
+            <h4 id="drawer-stamp-date">Stamped on AUG 23, 2026</h4>
+            <p id="drawer-stamp-notes" class="stamp-banner-notes">"Great adventure!"</p>
+          </div>
+          <button id="drawer-edit-visit-btn" class="stamp-edit-btn" title="Edit Visit Journal">✏️ Edit</button>
         </div>
 
         <!-- Metrics Grid -->
@@ -273,6 +300,202 @@
         <div style="display: flex; gap: 8px;">
           <button id="wishlist-export-btn" class="drawer-action-btn" style="flex: 1; justify-content: center;">📋 Copy List</button>
           <button id="wishlist-clear-btn" class="drawer-action-btn" style="flex: 1; justify-content: center; color: var(--danger-red);">🗑️ Clear</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Interactive Explorer Passport & Profiles Modal -->
+    <div id="passport-modal" class="terrain-modal passport-modal-size" role="dialog" aria-modal="true" aria-label="Adventure Passport">
+      <div class="modal-header">
+        <div class="passport-header-title-group">
+          <span class="passport-gold-icon">📔</span>
+          <div>
+            <h3 class="modal-title">National & State Parks Adventure Passport</h3>
+            <p class="modal-subtitle">Track your travels, collect vintage cancellation stamps, and unlock achievements</p>
+          </div>
+        </div>
+        <button id="passport-modal-close-btn" class="drawer-close-btn" aria-label="Close passport">&times;</button>
+      </div>
+
+      <!-- Passport Tabs Navigation -->
+      <div class="passport-tab-nav" role="tablist">
+        <button class="passport-tab-btn is-active" data-tab="stamps">
+          <span>🏷️ Passport Stamps</span>
+        </button>
+        <button class="passport-tab-btn" data-tab="achievements">
+          <span>🏆 Achievements & Badges</span>
+        </button>
+        <button class="passport-tab-btn" data-tab="stats">
+          <span>🗺️ Travel Territory</span>
+        </button>
+        <button class="passport-tab-btn" data-tab="profile">
+          <span>👤 Explorer Profile</span>
+        </button>
+      </div>
+
+      <div class="modal-body passport-modal-body">
+        
+        <!-- Tab 1: Passport Stamp Book -->
+        <div id="passport-tab-stamps" class="passport-tab-panel is-active">
+          <div class="stamps-overview-bar">
+            <div class="stamp-bar-stat">
+              <span class="stamp-bar-num" id="stamps-count-total">0</span>
+              <span class="stamp-bar-lbl">Parks Stamped</span>
+            </div>
+            <div class="stamp-bar-stat">
+              <span class="stamp-bar-num" id="stamps-acres-total">0</span>
+              <span class="stamp-bar-lbl">Acres Explored</span>
+            </div>
+            <div class="stamp-bar-stat">
+              <span class="stamp-bar-num" id="stamps-xp-total">0 XP</span>
+              <span class="stamp-bar-lbl">Explorer Experience</span>
+            </div>
+          </div>
+
+          <div id="passport-stamps-grid" class="passport-stamps-grid">
+            <!-- Vintage stamps injected dynamically -->
+          </div>
+        </div>
+
+        <!-- Tab 2: Achievements & Badges -->
+        <div id="passport-tab-achievements" class="passport-tab-panel">
+          <div class="achievements-summary-banner">
+            <div>
+              <h4 id="achievements-unlocked-title">Unlocked 0 / 12 Badges</h4>
+              <p>Explore different biomes, active volcanoes, and Canadian wilderness to unlock exclusive explorer badges.</p>
+            </div>
+          </div>
+          <div id="achievements-grid" class="achievements-grid">
+            <!-- Badges injected dynamically -->
+          </div>
+        </div>
+
+        <!-- Tab 3: Travel Territory & Conquered Map -->
+        <div id="passport-tab-stats" class="passport-tab-panel">
+          <div class="territory-stats-grid">
+            <div class="territory-card">
+              <span class="territory-num" id="territory-us-states">0 / 50</span>
+              <span class="territory-lbl">🇺🇸 US States Conquered</span>
+              <div id="territory-us-tags" class="territory-tags-cloud"></div>
+            </div>
+            <div class="territory-card">
+              <span class="territory-num" id="territory-ca-provinces">0 / 13</span>
+              <span class="territory-lbl">🇨🇦 Canadian Provinces & Territories</span>
+              <div id="territory-ca-tags" class="territory-tags-cloud"></div>
+            </div>
+          </div>
+
+          <div class="territory-progress-section">
+            <h4 class="drawer-section-title">Park System Completion</h4>
+            <div class="system-progress-item">
+              <div class="progress-info-row">
+                <span>🇺🇸 US National Parks</span>
+                <span id="prog-us-np">0 / 63 (0%)</span>
+              </div>
+              <div class="progress-bar-track">
+                <div id="bar-us-np" class="progress-bar-fill" style="width: 0%;"></div>
+              </div>
+            </div>
+
+            <div class="system-progress-item">
+              <div class="progress-info-row">
+                <span>🇨🇦 Parks Canada</span>
+                <span id="prog-ca-np">0 / 48 (0%)</span>
+              </div>
+              <div class="progress-bar-track">
+                <div id="bar-ca-np" class="progress-bar-fill" style="width: 0%;"></div>
+              </div>
+            </div>
+
+            <div class="system-progress-item">
+              <div class="progress-info-row">
+                <span>🍂 State & Provincial Parks</span>
+                <span id="prog-sp">0 Logged</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 4: Explorer Profile Switcher & Settings -->
+        <div id="passport-tab-profile" class="passport-tab-panel">
+          <div class="profile-card-large">
+            <div class="large-avatar-wrap" id="profile-avatar-display">🌲</div>
+            <div class="large-profile-info">
+              <div class="profile-header-edit">
+                <input type="text" id="profile-name-input" class="profile-name-input" value="Trail Explorer" />
+                <span id="profile-rank-display" class="rank-title-badge">Trail Scout (Lvl 1)</span>
+              </div>
+              <p class="profile-joined-date" id="profile-joined-date">Explorer since August 2026</p>
+              
+              <div class="avatar-picker-row">
+                <span class="avatar-picker-label">Choose Avatar:</span>
+                <div class="avatar-options">
+                  <button class="avatar-opt-btn" data-avatar="🌲">🌲</button>
+                  <button class="avatar-opt-btn" data-avatar="🏔️">🏔️</button>
+                  <button class="avatar-opt-btn" data-avatar="🦬">🦬</button>
+                  <button class="avatar-opt-btn" data-avatar="🧭">🧭</button>
+                  <button class="avatar-opt-btn" data-avatar="🐻">🐻</button>
+                  <button class="avatar-opt-btn" data-avatar="🦅">🦅</button>
+                  <button class="avatar-opt-btn" data-avatar="🐺">🐺</button>
+                  <button class="avatar-opt-btn" data-avatar="🛶">🛶</button>
+                  <button class="avatar-opt-btn" data-avatar="⛺">⛺</button>
+                  <button class="avatar-opt-btn" data-avatar="🌟">🌟</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Switch Explorer Profiles -->
+          <div class="profile-switcher-section">
+            <h4 class="drawer-section-title">Switch or Create Explorer Persona</h4>
+            <div id="profiles-list-container" class="profiles-list-container">
+              <!-- Injected profiles -->
+            </div>
+
+            <div class="add-profile-row">
+              <input type="text" id="new-profile-name-input" class="toolbar-select" placeholder="New Explorer Name..." style="flex: 1;" />
+              <button id="add-profile-btn" class="drawer-action-btn primary">+ Create Persona</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Log Park Visit Dialog Modal -->
+    <div id="visit-modal" class="terrain-modal log-visit-modal" role="dialog" aria-modal="true" aria-label="Log Park Visit">
+      <div class="modal-header">
+        <h3 class="modal-title">🌲 Stamp Park in Passport</h3>
+        <button id="visit-modal-close-btn" class="drawer-close-btn" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <h4 id="visit-modal-park-name" class="visit-park-title">Yellowstone National Park</h4>
+        
+        <div class="visit-form-group">
+          <label for="visit-date-input" class="visit-form-label">Date Visited</label>
+          <input type="date" id="visit-date-input" class="visit-input" />
+        </div>
+
+        <div class="visit-form-group">
+          <label class="visit-form-label">Your Personal Experience Rating</label>
+          <div class="star-rating-picker" id="visit-star-picker">
+            <button class="star-btn is-active" data-rating="1">★</button>
+            <button class="star-btn is-active" data-rating="2">★</button>
+            <button class="star-btn is-active" data-rating="3">★</button>
+            <button class="star-btn is-active" data-rating="4">★</button>
+            <button class="star-btn is-active" data-rating="5">★</button>
+          </div>
+        </div>
+
+        <div class="visit-form-group">
+          <label for="visit-notes-input" class="visit-form-label">Trip Memories & Journal Notes (+50 XP)</label>
+          <textarea id="visit-notes-input" class="visit-textarea" rows="3" placeholder="Describe your favorite hike, wildlife encounter, weather, or camping story..."></textarea>
+        </div>
+
+        <div class="visit-form-actions">
+          <button id="submit-visit-btn" class="drawer-action-btn primary" style="width: 100%; justify-content: center; padding: 12px;">
+            <span>★ Stamp My Adventure Passport (+150 XP) ★</span>
+          </button>
         </div>
       </div>
     </div>
@@ -369,6 +592,7 @@
   <!-- Application Scripts -->
   <script src="js/data.js"></script>
   <script src="js/storage.js"></script>
+  <script src="js/passport.js"></script>
   <script src="js/filters.js"></script>
   <script src="js/map.js"></script>
   <script src="js/ui.js"></script>

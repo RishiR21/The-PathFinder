@@ -13,7 +13,8 @@ class FilterEngine {
       searchQuery: "",
       selectedTags: new Set(),
       sortBy: "featured",
-      favoritesOnly: false
+      favoritesOnly: false,
+      visitedOnly: false
     };
     this.listeners = [];
   }
@@ -37,7 +38,6 @@ class FilterEngine {
   setCountry(country) {
     if (this.state.country !== country) {
       this.state.country = country;
-      // Reset state/province if not matching current country
       this.state.stateProvince = "all";
       this.notify();
     }
@@ -83,6 +83,13 @@ class FilterEngine {
     }
   }
 
+  setVisitedOnly(visitedOnly) {
+    if (this.state.visitedOnly !== visitedOnly) {
+      this.state.visitedOnly = visitedOnly;
+      this.notify();
+    }
+  }
+
   resetAll() {
     this.state = {
       mode: "all",
@@ -91,12 +98,12 @@ class FilterEngine {
       searchQuery: "",
       selectedTags: new Set(),
       sortBy: "featured",
-      favoritesOnly: false
+      favoritesOnly: false,
+      visitedOnly: false
     };
     this.notify();
   }
 
-  // Retrieve unique states/provinces based on current country filter
   getAvailableRegions() {
     let pool = this.allData;
     if (this.state.country !== "all") {
@@ -105,7 +112,6 @@ class FilterEngine {
 
     const regions = new Map();
     pool.forEach(p => {
-      // Handles multi-state codes like "NC/TN" or "WY/MT/ID"
       const regionsList = p.stateProvince.split("/").map(s => s.trim());
       regionsList.forEach(r => {
         if (!regions.has(r)) {
@@ -118,7 +124,6 @@ class FilterEngine {
     return Array.from(regions.values()).sort((a, b) => a.name.localeCompare(b.name));
   }
 
-  // Retrieve all unique tags with usage count
   getAllTags() {
     const tagCounts = new Map();
     this.allData.forEach(p => {
@@ -132,10 +137,10 @@ class FilterEngine {
       .sort((a, b) => b.count - a.count);
   }
 
-  // Execute filtering pipeline
   getFilteredData() {
-    const { mode, country, stateProvince, searchQuery, selectedTags, sortBy, favoritesOnly } = this.state;
+    const { mode, country, stateProvince, searchQuery, selectedTags, sortBy, favoritesOnly, visitedOnly } = this.state;
     const favorites = window.storage ? window.storage.getFavorites() : [];
+    const visitedList = window.storage ? window.storage.getVisitedList() : [];
 
     let results = this.allData.filter(park => {
       // 1. Favorites-only filter
@@ -143,7 +148,12 @@ class FilterEngine {
         return false;
       }
 
-      // 2. Mode filter (National vs State/Provincial)
+      // 2. Visited-only filter
+      if (visitedOnly && !visitedList.includes(park.id)) {
+        return false;
+      }
+
+      // 3. Mode filter
       if (mode === "national" && park.type !== "national") {
         return false;
       }
@@ -151,19 +161,19 @@ class FilterEngine {
         return false;
       }
 
-      // 3. Country filter
+      // 4. Country filter
       if (country !== "all" && park.country !== country) {
         return false;
       }
 
-      // 4. State / Province filter
+      // 5. State / Province filter
       if (stateProvince !== "all") {
         const matchesState = park.stateProvince.toLowerCase().includes(stateProvince.toLowerCase()) ||
                              (park.stateCode && park.stateCode.toLowerCase().includes(stateProvince.toLowerCase()));
         if (!matchesState) return false;
       }
 
-      // 5. Selected Activity / Landscape Tags (AND match: park must contain all selected tags)
+      // 6. Selected Activity / Landscape Tags
       if (selectedTags.size > 0) {
         const parkTags = park.tags || [];
         for (const tag of selectedTags) {
@@ -173,7 +183,7 @@ class FilterEngine {
         }
       }
 
-      // 6. Search Query (Matches name, state/province, description, highlights, tags)
+      // 7. Search Query
       if (searchQuery) {
         const target = [
           park.name,
@@ -184,7 +194,6 @@ class FilterEngine {
           ...(park.tags || [])
         ].join(" ").toLowerCase();
 
-        // Check each word in query
         const queryTerms = searchQuery.split(/\s+/).filter(Boolean);
         const matchesAllTerms = queryTerms.every(term => target.includes(term));
         if (!matchesAllTerms) return false;
@@ -193,7 +202,6 @@ class FilterEngine {
       return true;
     });
 
-    // Sort results
     return this.sortResults(results, sortBy);
   }
 
@@ -204,17 +212,16 @@ class FilterEngine {
         return copy.sort((a, b) => a.name.localeCompare(b.name));
       case "name-desc":
         return copy.sort((a, b) => b.name.localeCompare(a.name));
-      case "established-asc": // Oldest first
+      case "established-asc":
         return copy.sort((a, b) => a.establishedYear - b.establishedYear);
-      case "established-desc": // Newest first
+      case "established-desc":
         return copy.sort((a, b) => b.establishedYear - a.establishedYear);
-      case "area-desc": // Largest first
+      case "area-desc":
         return copy.sort((a, b) => (b.areaAcres || 0) - (a.areaAcres || 0));
-      case "rating-desc": // Highest rated
+      case "rating-desc":
         return copy.sort((a, b) => (b.rating || 0) - (a.rating || 0));
       case "featured":
       default:
-        // Prioritize National Parks, then by rating and acreage
         return copy.sort((a, b) => {
           if (a.type === "national" && b.type !== "national") return -1;
           if (b.type === "national" && a.type !== "national") return 1;

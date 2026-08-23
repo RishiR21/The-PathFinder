@@ -100,7 +100,6 @@ class TerrainMap {
 
     // Map click outside of pins
     this.map.on("click", (e) => {
-      // If clicking directly on the map background, deselect active park
       if (e.originalEvent.target.id === this.containerId || e.originalEvent.target.classList.contains("leaflet-container")) {
         this.clearActivePark();
       }
@@ -110,14 +109,12 @@ class TerrainMap {
   setBasemap(name) {
     if (!this.basemaps[name]) name = "terrain";
     
-    // Remove existing layers
     Object.values(this.basemaps).forEach(layer => {
       if (this.map.hasLayer(layer)) {
         this.map.removeLayer(layer);
       }
     });
 
-    // Add selected layer
     this.basemaps[name].addTo(this.map);
     this.currentBasemapName = name;
 
@@ -126,23 +123,28 @@ class TerrainMap {
     }
   }
 
-  // Generate SVG custom DivIcon
+  // Generate SVG custom DivIcon with Visited Stamp indicator
   createParkIcon(park, isSelected = false) {
     const isNational = park.type === "national";
-    const flagEmoji = park.country === "US" ? "🇺🇸" : "🇨🇦";
+    const isVisited = window.storage ? window.storage.isVisited(park.id) : false;
     const typeClass = isNational ? "type-national" : "type-state";
     const activeClass = isSelected ? "is-selected" : "";
+    const visitedClass = isVisited ? "is-visited" : "";
 
-    // SVG icon: Pine tree for National, Maple/Oak leaf for State
     const iconSvg = isNational
       ? `<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2L4 14h4l-3 6h14l-3-6h4L12 2zm-1 18h2v3h-2v-3z"/></svg>`
       : `<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66l.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75C7 8 17 8 17 8z"/></svg>`;
 
+    const visitedBadge = isVisited
+      ? `<div class="marker-visited-stamp" title="Visited & Stamped!">✓</div>`
+      : "";
+
     const html = `
-      <div class="park-marker-pin ${typeClass} ${activeClass}" data-park-id="${park.id}">
+      <div class="park-marker-pin ${typeClass} ${activeClass} ${visitedClass}" data-park-id="${park.id}">
         <div class="marker-pulse"></div>
         <div class="marker-badge">
           ${iconSvg}
+          ${visitedBadge}
         </div>
         <div class="marker-tip"></div>
       </div>
@@ -169,9 +171,15 @@ class TerrainMap {
         title: park.name
       });
 
-      // Hover Tooltip
       const flag = park.country === "US" ? "🇺🇸" : "🇨🇦";
       const typeLabel = park.type === "national" ? "National Park" : "State / Provincial Park";
+      const isVisited = window.storage ? window.storage.isVisited(park.id) : false;
+      const visitDetails = isVisited ? window.storage.getVisitDetails(park.id) : null;
+
+      const visitedStatusHtml = isVisited
+        ? `<div class="map-tooltip-visited">★ Stamped in Passport: ${visitDetails?.date || "Visited"}</div>`
+        : "";
+
       const tooltipContent = `
         <div class="map-tooltip-content">
           <div class="map-tooltip-img" style="background-image: url('${park.heroImage}')"></div>
@@ -179,6 +187,7 @@ class TerrainMap {
             <span class="map-tooltip-badge ${park.type}">${flag} ${typeLabel}</span>
             <h4 class="map-tooltip-title">${park.name}</h4>
             <p class="map-tooltip-loc">📍 ${park.stateProvince}</p>
+            ${visitedStatusHtml}
           </div>
         </div>
       `;
@@ -190,7 +199,6 @@ class TerrainMap {
         opacity: 1
       });
 
-      // Click handler
       marker.on("click", () => {
         this.selectPark(park.id, true);
       });
@@ -199,7 +207,6 @@ class TerrainMap {
       this.clusterGroup.addLayer(marker);
     });
 
-    // If an active park is currently selected, re-highlight it
     if (this.activeParkId && this.markerMap.has(this.activeParkId)) {
       this.highlightMarker(this.activeParkId);
     }
@@ -212,14 +219,12 @@ class TerrainMap {
     this.activeParkId = parkId;
     this.highlightMarker(parkId);
 
-    // Smooth fly to park location with dynamic zoom level
     const targetZoom = Math.max(this.map.getZoom(), 8);
     this.map.flyTo(park.coordinates, targetZoom, {
       duration: 1.2,
       easeLinearity: 0.25
     });
 
-    // Add animated ripple pulse circle
     this.addPulseCircle(park.coordinates);
 
     if (notifyListeners) {
@@ -228,7 +233,6 @@ class TerrainMap {
   }
 
   highlightMarker(parkId) {
-    // Reset all markers
     this.markerMap.forEach((marker, id) => {
       const park = (window.PARKS_DATA || []).find(p => p.id === id);
       if (park) {
@@ -251,7 +255,6 @@ class TerrainMap {
       fillOpacity: 0.2
     }).addTo(this.map);
 
-    // Fade out after 3 seconds
     setTimeout(() => {
       if (this.activePulseCircle) {
         this.map.removeLayer(this.activePulseCircle);
