@@ -92,7 +92,7 @@ a {
 }
 
 /* ==========================================================================
-   Header Navigation & Profile Pill
+   Header Navigation & View Switcher
    ========================================================================== */
 .terrain-header {
   height: var(--header-height);
@@ -111,7 +111,7 @@ a {
 .brand-section {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 18px;
   flex-shrink: 0;
 }
 
@@ -154,6 +154,40 @@ a {
   font-weight: 500;
   color: var(--text-muted);
   letter-spacing: 0.5px;
+}
+
+/* Main View Switcher Navigation */
+.main-view-switcher {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  padding: 3px;
+  gap: 2px;
+}
+
+.view-switch-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  border-radius: var(--radius-full);
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.view-switch-btn:hover {
+  color: var(--text-primary);
+}
+
+.view-switch-btn.is-active {
+  background: #15803d;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(21, 128, 61, 0.4);
 }
 
 /* Center Mode Switcher */
@@ -297,7 +331,6 @@ a {
   flex-shrink: 0;
 }
 
-/* Header Profile Pill */
 .header-profile-btn {
   display: flex;
   align-items: center;
@@ -450,7 +483,6 @@ a {
   color: var(--text-primary);
 }
 
-/* Visited Filter Button */
 .visited-filter-pill {
   border-color: rgba(251, 191, 36, 0.4) !important;
   color: var(--accent-gold) !important;
@@ -462,7 +494,6 @@ a {
   box-shadow: 0 0 10px rgba(251, 191, 36, 0.3);
 }
 
-/* Tag Pills Scroll Container */
 .tag-pills-scroll {
   display: flex;
   align-items: center;
@@ -541,7 +572,7 @@ a {
 
 /* ==========================================================================
    Main Split Layout (Sidebar + Map Canvas)
-   ========================================================================= */
+   ========================================================================== */
 .terrain-main-content {
   display: flex;
   flex: 1;
@@ -549,7 +580,6 @@ a {
   overflow: hidden;
 }
 
-/* Left Sidebar (Parks List) */
 .terrain-sidebar {
   width: var(--sidebar-width);
   height: 100%;
@@ -727,7 +757,6 @@ a {
   white-space: nowrap;
 }
 
-/* Empty State */
 .empty-state {
   display: none;
   flex-direction: column;
@@ -786,7 +815,6 @@ a {
   transform: scale(1.05);
 }
 
-/* Custom Marker Pins */
 .park-marker-pin {
   width: 32px;
   height: 40px;
@@ -826,7 +854,6 @@ a {
   background: linear-gradient(135deg, #f59e0b, #b45309);
 }
 
-/* Visited Golden Stamp Marker Ring */
 .park-marker-pin.is-visited .marker-badge {
   border: 2px solid #fbbf24;
   box-shadow: 0 0 12px var(--accent-gold-glow);
@@ -884,7 +911,6 @@ a {
   100% { transform: scale(1.4); opacity: 0; }
 }
 
-/* Clusters */
 .terrain-cluster-wrapper {
   background: none;
   border: none;
@@ -923,7 +949,6 @@ a {
   box-shadow: 0 4px 16px rgba(251, 191, 36, 0.4);
 }
 
-/* Map Tooltips */
 .leaflet-tooltip.custom-park-tooltip {
   background: rgba(10, 20, 15, 0.94);
   backdrop-filter: var(--glass-blur);
@@ -982,7 +1007,455 @@ a {
 }
 
 /* ==========================================================================
-   Park Detail Drawer
+   COMMUNITY & EXPLORER PROFILES PAGE
+   ========================================================================== */
+.community-page-container {
+  flex: 1;
+  height: calc(100vh - var(--header-height));
+  background: var(--bg-dark);
+  position: relative;
+  overflow: hidden;
+}
+
+.community-page-scroll {
+  height: 100%;
+  overflow-y: auto;
+  padding: 30px 40px 60px 40px;
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.community-hero-banner {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(6, 95, 70, 0.35));
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: var(--radius-lg);
+  padding: 36px 40px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.community-badge-tag {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #34d399;
+  text-transform: uppercase;
+  display: inline-block;
+  margin-bottom: 8px;
+}
+
+.community-hero-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 10px;
+  line-height: 1.2;
+}
+
+.community-hero-desc {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  max-width: 720px;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.community-hero-cta {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Creator Showcase Card */
+.creator-showcase-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.creator-card {
+  background: linear-gradient(145deg, rgba(26, 49, 38, 0.95), rgba(15, 30, 23, 0.98));
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(251, 191, 36, 0.15);
+}
+
+.creator-header-banner {
+  background: rgba(251, 191, 36, 0.15);
+  border-bottom: 1px solid rgba(251, 191, 36, 0.3);
+  padding: 10px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.creator-founder-badge {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--accent-gold);
+  letter-spacing: 0.8px;
+}
+
+.creator-level-pill {
+  font-size: 0.72rem;
+  font-weight: 800;
+  background: var(--accent-gold);
+  color: #000;
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+}
+
+.creator-card-body {
+  padding: 26px 30px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.creator-avatar-wrap {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #d97706, #b45309);
+  border: 3px solid #fbbf24;
+  box-shadow: 0 4px 20px rgba(251, 191, 36, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.8rem;
+  flex-shrink: 0;
+}
+
+.creator-main-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.creator-name {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.creator-title {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.creator-bio {
+  font-size: 0.92rem;
+  color: #cbd5e1;
+  line-height: 1.55;
+}
+
+.creator-favorite-park {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.fav-park-label {
+  font-weight: 600;
+}
+
+.fav-park-value {
+  color: #34d399;
+  font-weight: 700;
+}
+
+/* Social Buttons */
+.creator-social-links {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.social-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.x-twitter-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.x-twitter-btn:hover {
+  background: #ffffff;
+  color: #000000;
+  border-color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(255, 255, 255, 0.25);
+}
+
+.linkedin-btn {
+  background: rgba(10, 102, 194, 0.2);
+  color: #60a5fa;
+  border: 1px solid rgba(10, 102, 194, 0.5);
+}
+
+.linkedin-btn:hover {
+  background: #0a66c2;
+  color: #ffffff;
+  border-color: #0a66c2;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(10, 102, 194, 0.4);
+}
+
+/* Community 2-Column Split Section */
+.community-grid-section {
+  display: grid;
+  grid-template-columns: 440px 1fr;
+  gap: 28px;
+  align-items: start;
+}
+
+.add-community-profile-card,
+.community-roster-column {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+}
+
+.card-section-header {
+  margin-bottom: 20px;
+}
+
+.community-card-title {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.community-card-subtitle {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+/* Community Form */
+.community-profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.form-row-2col {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.form-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  outline: none;
+  transition: var(--transition);
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  border-color: var(--national-green);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.form-select option {
+  background: #0f1e17;
+  color: #fff;
+}
+
+.form-textarea {
+  resize: vertical;
+}
+
+.community-avatar-selector {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.comm-avatar-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  transition: var(--transition);
+}
+
+.comm-avatar-btn:hover {
+  background: rgba(16, 185, 129, 0.2);
+  transform: scale(1.15);
+}
+
+.comm-avatar-btn.is-active {
+  background: #047857;
+  border-color: var(--national-green);
+  box-shadow: 0 0 8px var(--national-green-glow);
+  transform: scale(1.1);
+}
+
+/* Community Explorers Grid */
+.community-explorers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.community-explorer-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: var(--transition);
+  position: relative;
+}
+
+.community-explorer-card:hover {
+  background: var(--bg-card-hover);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.comm-card-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.comm-card-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #047857;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.comm-card-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.comm-card-name {
+  font-size: 0.95rem;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.comm-card-title {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.comm-card-rank-badge {
+  font-size: 0.65rem;
+  font-weight: 800;
+  background: var(--accent-gold);
+  color: #000;
+  padding: 1px 6px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-top: 2px;
+}
+
+.comm-card-bio {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.comm-card-fav {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+}
+
+.comm-card-fav strong {
+  color: #34d399;
+}
+
+.comm-card-socials {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.comm-social-icon-btn {
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 0.72rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  transition: var(--transition);
+}
+
+.comm-social-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   Detail Drawer, Wishlist, Passport & Modals
    ========================================================================== */
 .terrain-drawer {
   position: fixed;
@@ -1084,7 +1557,6 @@ a {
   color: var(--text-secondary);
 }
 
-/* Drawer Body */
 .drawer-body {
   flex: 1;
   overflow-y: auto;
@@ -1135,7 +1607,6 @@ a {
   color: var(--accent-gold);
 }
 
-/* Visited Stamp Banner in Drawer */
 .drawer-visited-stamp-banner {
   background: rgba(245, 158, 11, 0.12);
   border: 1px solid rgba(245, 158, 11, 0.3);
@@ -1174,7 +1645,6 @@ a {
   border-radius: 4px;
 }
 
-/* Stats Metrics Grid */
 .drawer-stats-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -1202,7 +1672,6 @@ a {
   color: var(--text-primary);
 }
 
-/* Drawer Sections */
 .drawer-section {
   display: flex;
   flex-direction: column;
@@ -1423,7 +1892,7 @@ a {
 }
 
 /* ==========================================================================
-   Adventure Passport & Profile Modal
+   Adventure Passport Modal
    ========================================================================== */
 .passport-modal-size {
   width: 760px;
@@ -1446,7 +1915,6 @@ a {
   color: var(--text-muted);
 }
 
-/* Passport Tab Navigation */
 .passport-tab-nav {
   display: flex;
   border-bottom: 1px solid var(--border-subtle);
@@ -1489,7 +1957,6 @@ a {
   gap: 18px;
 }
 
-/* Stamps Overview Bar */
 .stamps-overview-bar {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -1518,7 +1985,6 @@ a {
   color: var(--text-muted);
 }
 
-/* Stamps Grid */
 .passport-stamps-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -1526,7 +1992,7 @@ a {
 }
 
 .passport-stamp-card {
-  background: #f4eee1; /* Authentic passport parchment */
+  background: #f4eee1;
   color: #2b2b2b;
   border-radius: var(--radius-md);
   padding: 12px;
@@ -1573,7 +2039,6 @@ a {
   margin-top: 4px;
 }
 
-/* Achievements Grid */
 .achievements-summary-banner {
   background: rgba(16, 185, 129, 0.12);
   border: 1px solid rgba(16, 185, 129, 0.3);
@@ -1662,7 +2127,6 @@ a {
   border-radius: 2px;
 }
 
-/* Travel Territory Tab */
 .territory-stats-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -1739,7 +2203,6 @@ a {
   transition: width 0.5s ease;
 }
 
-/* Profile Tab */
 .profile-card-large {
   display: flex;
   gap: 18px;
@@ -1838,7 +2301,6 @@ a {
   transform: scale(1.15);
 }
 
-/* Profile Switcher List */
 .profile-switcher-section {
   display: flex;
   flex-direction: column;
@@ -1971,7 +2433,7 @@ a {
   transform: scale(1.2);
 }
 
-/* Insights / Statistics Modal */
+/* Modal Core */
 .terrain-modal {
   position: fixed;
   top: 50%;
@@ -2067,9 +2529,7 @@ a {
   color: var(--accent-gold);
 }
 
-/* ==========================================================================
-   Toast Notification System
-   ========================================================================== */
+/* Toast Container */
 .toast-container {
   position: fixed;
   bottom: 24px;
@@ -2110,9 +2570,13 @@ a {
 .toast-info .toast-icon { color: #38bdf8; }
 .toast-warning .toast-icon { color: var(--state-amber); }
 
-/* ==========================================================================
-   Responsive Adaptations
-   ========================================================================== */
+/* Responsive Adjustments */
+@media (max-width: 1024px) {
+  .community-grid-section {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 900px) {
   .terrain-header {
     padding: 0 12px;
@@ -2139,6 +2603,15 @@ a {
 
   .terrain-sidebar {
     width: 320px;
+  }
+
+  .creator-card-body {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .creator-social-links {
+    justify-content: center;
   }
 }
 
@@ -2188,6 +2661,14 @@ a {
 
   .map-canvas {
     height: 65vh;
+  }
+
+  .community-page-scroll {
+    padding: 16px;
+  }
+
+  .form-row-2col {
+    grid-template-columns: 1fr;
   }
 
   .terrain-drawer,

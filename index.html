@@ -26,7 +26,7 @@
     <!-- Top Header Navigation -->
     <header class="terrain-header">
       <div class="brand-section">
-        <a href="#" class="brand-logo" title="The Terrain Home">
+        <a href="#" class="brand-logo" id="nav-brand-logo" title="The Terrain Home">
           <div class="logo-icon">
             <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
               <path d="M14 6l-3.75 5L7 7l-5 8h20L14 6z"/>
@@ -37,10 +37,31 @@
             <span class="logo-subtitle">US & Canada Parks Explorer</span>
           </div>
         </a>
+
+        <!-- Main View Switcher Tabs (Map Explorer vs Community & Profiles) -->
+        <nav class="main-view-switcher" role="navigation" aria-label="Main Navigation">
+          <button id="view-tab-map" class="view-switch-btn is-active" title="Explore Interactive Map">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+              <line x1="8" y1="2" x2="8" y2="18"></line>
+              <line x1="16" y1="6" x2="16" y2="22"></line>
+            </svg>
+            <span>Map Explorer</span>
+          </button>
+          <button id="view-tab-community" class="view-switch-btn" title="View & Add Explorer Profiles">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            <span>Community & Explorers</span>
+          </button>
+        </nav>
       </div>
 
-      <!-- Center Controls: Mode Toggle & Country Filter & Search -->
-      <div class="header-center">
+      <!-- Center Controls: Mode Toggle & Country Filter & Search (Visible on Map View) -->
+      <div class="header-center" id="header-map-controls">
         <!-- Park Mode Switcher (All / National / State) -->
         <div class="mode-toggle-group" role="group" aria-label="Park Classification Toggle">
           <button class="mode-btn is-active" data-mode-toggle="all" title="View All Parks">
@@ -103,8 +124,8 @@
       </div>
     </header>
 
-    <!-- Secondary Filter Toolbar -->
-    <div class="terrain-toolbar">
+    <!-- Secondary Filter Toolbar (For Map View) -->
+    <div class="terrain-toolbar" id="terrain-map-toolbar">
       <div class="toolbar-left">
         <!-- Region / State / Province Dropdown -->
         <select id="region-select" class="toolbar-select" aria-label="Filter by State or Province">
@@ -148,8 +169,8 @@
       </div>
     </div>
 
-    <!-- Main Content: Split Sidebar & Leaflet Map Canvas -->
-    <main class="terrain-main-content">
+    <!-- VIEW 1: Main Map & Sidebar Explorer View -->
+    <main class="terrain-main-content" id="map-page-view">
       <!-- Left Sidebar: Scrollable Park Cards -->
       <aside class="terrain-sidebar" aria-label="Parks Directory List">
         <div id="parks-list-container" class="parks-list-scroll">
@@ -181,8 +202,165 @@
           </button>
         </div>
       </div>
-
     </main>
+
+    <!-- VIEW 2: Dedicated Community & Explorer Profiles Page -->
+    <section class="community-page-container" id="community-page-view" style="display: none;">
+      <div class="community-page-scroll">
+        
+        <!-- Hero Header -->
+        <div class="community-hero-banner">
+          <div class="community-hero-content">
+            <span class="community-badge-tag">🌲 EXPLORER REGISTRY & COMMUNITY</span>
+            <h1 class="community-hero-title">Meet the Explorers Behind The Terrain</h1>
+            <p class="community-hero-desc">
+              Connect with passionate nature lovers, park rangers, and thru-hikers. Create your profile, share your social handles, and showcase your conquered wilderness.
+            </p>
+            <div class="community-hero-cta">
+              <a href="#create-profile-anchor" class="drawer-action-btn primary" id="jump-to-add-profile-btn">
+                <span>+ Register Your Profile</span>
+              </a>
+              <button class="drawer-action-btn" id="community-back-to-map-btn">
+                <span>🗺️ Return to Interactive Map</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Featured Creator Showcase Card -->
+        <div class="creator-showcase-section">
+          <div class="creator-card">
+            <div class="creator-header-banner">
+              <span class="creator-founder-badge">👑 APP FOUNDER & LEAD EXPLORER</span>
+              <div class="creator-level-pill">Level 10 Summit Legend</div>
+            </div>
+
+            <div class="creator-card-body">
+              <div class="creator-avatar-wrap">👑</div>
+              <div class="creator-main-info">
+                <h2 class="creator-name">Rishi Ramchandani</h2>
+                <p class="creator-title">Creator & Lead Architect &bull; 📍 Texas, USA</p>
+                <p class="creator-bio">
+                  Creator of <strong>The Terrain</strong>. Dedicated to building immersive, interactive mapping tools that celebrate conservation and empower people to explore every corner of the United States and Canada's protected wilderness.
+                </p>
+
+                <div class="creator-favorite-park">
+                  <span class="fav-park-label">Favorite Sanctuary:</span>
+                  <span class="fav-park-value">🦬 Yellowstone National Park &amp; Rocky Mountains</span>
+                </div>
+
+                <!-- Verified Social Profile Links -->
+                <div class="creator-social-links">
+                  <a href="https://x.com/1RishiR" target="_blank" rel="noopener noreferrer" class="social-btn x-twitter-btn" title="Follow Rishi on X (Twitter)">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                    <span>Connect on X (@1RishiR)</span>
+                  </a>
+
+                  <a href="https://www.linkedin.com/in/rishi-ramchandani-73a74916b/" target="_blank" rel="noopener noreferrer" class="social-btn linkedin-btn" title="Connect on LinkedIn">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                      <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.2V10.9H6.46M7.83 6.45a1.6 1.6 0 0 0-1.6 1.6a1.6 1.6 0 0 0 1.6 1.6a1.6 1.6 0 0 0 1.6-1.6a1.6 1.6 0 0 0-1.6-1.6z"/>
+                    </svg>
+                    <span>LinkedIn Profile</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add Profile & Community Roster Split Section -->
+        <div class="community-grid-section" id="create-profile-anchor">
+          
+          <!-- Left Column: Add / Register New Profile Form -->
+          <div class="add-community-profile-card">
+            <div class="card-section-header">
+              <h3 class="community-card-title">📝 Add Explorer Profile</h3>
+              <p class="community-card-subtitle">Create your personal explorer card with your social links and favorite park.</p>
+            </div>
+
+            <form id="community-add-profile-form" class="community-profile-form">
+              <div class="form-row-2col">
+                <div class="form-field">
+                  <label for="comm-input-name" class="form-label">Full Name / Trail Handle *</label>
+                  <input type="text" id="comm-input-name" class="form-input" placeholder="e.g. Alex Wilderness" required />
+                </div>
+                <div class="form-field">
+                  <label for="comm-input-title" class="form-label">Explorer Tagline</label>
+                  <input type="text" id="comm-input-title" class="form-input" placeholder="e.g. Canyon Backpacker" />
+                </div>
+              </div>
+
+              <!-- Avatar Picker -->
+              <div class="form-field">
+                <label class="form-label">Select Avatar Icon</label>
+                <div class="community-avatar-selector" id="comm-avatar-picker">
+                  <button type="button" class="comm-avatar-btn is-active" data-avatar="🌲">🌲</button>
+                  <button type="button" class="comm-avatar-btn" data-avatar="🏔️">🏔️</button>
+                  <button type="button" class="comm-avatar-btn" data-avatar="🦬">🦬</button>
+                  <button type="button" class="comm-avatar-btn" data-avatar="🧭">🧭</button>
+                  <button type="button" class="comm-avatar-btn" data-avatar="🐻">🐻</button>
+                  <button type="button" class="comm-avatar-btn" data-avatar="🦅">🦅</button>
+                  <button type="button" class="comm-avatar-btn" data-avatar="🐺">🐺</button>
+                  <button type="button" class="comm-avatar-btn" data-avatar="🛶">🛶</button>
+                  <button type="button" class="comm-avatar-btn" data-avatar="⛺">⛺</button>
+                  <button type="button" class="comm-avatar-btn" data-avatar="👑">👑</button>
+                </div>
+              </div>
+
+              <div class="form-row-2col">
+                <div class="form-field">
+                  <label for="comm-input-home" class="form-label">Home Base / Location</label>
+                  <input type="text" id="comm-input-home" class="form-input" placeholder="e.g. Seattle, WA or Calgary, AB" />
+                </div>
+                <div class="form-field">
+                  <label for="comm-input-favorite-park" class="form-label">Favorite Park Sanctuary</label>
+                  <select id="comm-input-favorite-park" class="form-select">
+                    <!-- Populated dynamically -->
+                  </select>
+                </div>
+              </div>
+
+              <!-- Social Links -->
+              <div class="form-row-2col">
+                <div class="form-field">
+                  <label for="comm-input-x" class="form-label">X (Twitter) URL or Handle</label>
+                  <input type="text" id="comm-input-x" class="form-input" placeholder="https://x.com/yourhandle" value="https://x.com/1RishiR" />
+                </div>
+                <div class="form-field">
+                  <label for="comm-input-linkedin" class="form-label">LinkedIn Profile URL</label>
+                  <input type="text" id="comm-input-linkedin" class="form-input" placeholder="https://linkedin.com/in/yourprofile" value="https://www.linkedin.com/in/rishi-ramchandani-73a74916b/" />
+                </div>
+              </div>
+
+              <div class="form-field">
+                <label for="comm-input-bio" class="form-label">Bio & Favorite Wilderness Memory</label>
+                <textarea id="comm-input-bio" class="form-textarea" rows="3" placeholder="Tell other explorers about your favorite trails, camping stories, or bucket list goals..."></textarea>
+              </div>
+
+              <button type="submit" class="drawer-action-btn primary" style="width: 100%; justify-content: center; padding: 12px;">
+                <span>★ Add Profile to Community Registry (+200 XP) ★</span>
+              </button>
+            </form>
+          </div>
+
+          <!-- Right Column: Registered Community Explorer Cards -->
+          <div class="community-roster-column">
+            <div class="card-section-header">
+              <h3 class="community-card-title">🏕️ Registered Community Explorers</h3>
+              <p class="community-card-subtitle">Browse profiles, inspect conquered territory, and connect.</p>
+            </div>
+
+            <div id="community-explorers-grid" class="community-explorers-grid">
+              <!-- Community Cards injected dynamically -->
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
 
     <!-- Park Detail Drawer (Slides from Right) -->
     <div id="detail-drawer" class="terrain-drawer" role="dialog" aria-modal="true" aria-label="Park Details">
