@@ -311,16 +311,28 @@ class TerrainUI {
       });
     }
 
-    // Share & Copy Coords
+    // Share Deep Link & Coordinates
     if (this.dom.drawerShareBtn) {
       this.dom.drawerShareBtn.addEventListener("click", () => {
         if (!this.activePark) return;
-        const coords = `${this.activePark.coordinates[0].toFixed(4)}, ${this.activePark.coordinates[1].toFixed(4)}`;
-        navigator.clipboard.writeText(`${this.activePark.name} - ${coords}\n${this.activePark.officialUrl}`)
-          .then(() => this.showToast("Park details & coordinates copied!", "success"))
-          .catch(() => this.showToast(`Coordinates: ${coords}`, "info"));
+        this.sharePark(this.activePark);
       });
     }
+
+    // Handle browser back/forward history navigation for park deep links
+    window.addEventListener("popstate", () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const parkId = urlParams.get("park") || urlParams.get("p");
+      if (parkId) {
+        const park = (window.PARKS_DATA || []).find(p => p.id === parkId);
+        if (park) {
+          this.map.selectPark(park.id);
+          this.openDrawer(park);
+        }
+      } else {
+        this.closeDrawer();
+      }
+    });
 
     // Wishlist Drawer Toggles
     if (this.dom.wishlistToggleBtn) {
@@ -656,6 +668,13 @@ function getFlagSvg(country) {
     this.updateDrawerFavState(window.storage.isFavorite(park.id));
     this.updateDrawerVisitedBanner(park.id);
 
+    // Sync deep-link query parameter in browser address bar
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.set("park", park.id);
+      window.history.replaceState({ parkId: park.id }, "", url.toString());
+    } catch (e) {}
+
     this.dom.detailDrawer?.classList.add("is-open");
     this.dom.drawerOverlay?.classList.add("is-open");
   }
@@ -664,6 +683,48 @@ function getFlagSvg(country) {
     this.activePark = null;
     this.dom.detailDrawer?.classList.remove("is-open");
     this.dom.drawerOverlay?.classList.remove("is-open");
+
+    // Clean up query parameter when drawer is closed
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("park");
+      url.searchParams.delete("p");
+      window.history.replaceState({}, "", url.pathname + (url.search ? url.search : ""));
+    } catch (e) {}
+  }
+
+  sharePark(park) {
+    const origin = window.location.origin && window.location.origin !== "null" ? window.location.origin : "https://the-path-finder.vercel.app";
+    const pathname = window.location.pathname && window.location.pathname !== "blank" ? window.location.pathname : "/";
+    const shareUrl = `${origin}${pathname}?park=${encodeURIComponent(park.id)}`;
+
+    if (navigator.share) {
+      navigator.share({
+        title: `${park.name} | PathFinder`,
+        text: `Explore ${park.name} (${park.stateProvince}) on PathFinder!`,
+        url: shareUrl
+      })
+      .then(() => this.showToast("Park shared successfully!", "success"))
+      .catch((err) => {
+        if (err && err.name !== "AbortError") {
+          this.copyShareUrl(park, shareUrl);
+        }
+      });
+    } else {
+      this.copyShareUrl(park, shareUrl);
+    }
+  }
+
+  copyShareUrl(park, shareUrl) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(shareUrl)
+        .then(() => this.showToast(`PathFinder link for ${park.name} copied to clipboard!`, "success"))
+        .catch(() => {
+          prompt(`Share link for ${park.name}:`, shareUrl);
+        });
+    } else {
+      prompt(`Share link for ${park.name}:`, shareUrl);
+    }
   }
 
   updateDrawerFavState(isFav) {

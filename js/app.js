@@ -22,5 +22,24 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initial trigger to render map markers and card list
   filterEngine.notify();
 
+  // Handle incoming deep link (?park=id or ?p=id or #park=id)
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const deepParkId = urlParams.get("park") || urlParams.get("p") || (window.location.hash.startsWith("#park=") ? window.location.hash.replace("#park=", "") : null);
+
+    if (deepParkId) {
+      const targetPark = data.find(p => p.id === deepParkId || p.id.toLowerCase() === deepParkId.toLowerCase());
+      if (targetPark) {
+        setTimeout(() => {
+          terrainMap.selectPark(targetPark.id);
+          terrainUI.openDrawer(targetPark);
+          terrainUI.showToast(`Exploring ${targetPark.name}`, "info");
+        }, 400);
+      }
+    }
+  } catch (err) {
+    console.error("Deep link parse error:", err);
+  }
+
   console.log("✨ PathFinder ready for exploration!");
 });
