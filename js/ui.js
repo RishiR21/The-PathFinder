@@ -581,6 +581,8 @@ function getFlagSvg(country) {
 
       card.addEventListener("click", (e) => {
         if (e.target.closest(".park-card-bookmark-btn")) return;
+        this.openDrawer(park);
+        this.highlightActiveCard(park.id);
         this.map.selectPark(park.id);
       });
 
@@ -991,11 +993,15 @@ function getFlagSvg(country) {
           </div>
         `).join("");
 
-        this.dom.journeyParksList.querySelectorAll("[data-action='view']").forEach(btn => {
-          btn.addEventListener("click", () => {
-            const id = btn.getAttribute("data-id");
-            this.closeJourneyModal();
-            this.map.selectPark(id);
+        this.dom.journeyParksList.querySelectorAll(".journey-item-card").forEach(card => {
+          card.addEventListener("click", (e) => {
+            const id = card.getAttribute("data-park-id");
+            const park = (window.PARKS_DATA || []).find(p => p.id === id);
+            if (park) {
+              this.closeJourneyModal();
+              this.openDrawer(park);
+              this.map.selectPark(id);
+            }
           });
         });
       }
@@ -1044,16 +1050,22 @@ function getFlagSvg(country) {
       </div>
     `).join("");
 
-    this.dom.wishlistList.querySelectorAll("[data-action='view']").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const id = btn.getAttribute("data-id");
-        this.closeWishlist();
-        this.map.selectPark(id);
+    this.dom.wishlistList.querySelectorAll(".wishlist-item").forEach(item => {
+      item.addEventListener("click", (e) => {
+        if (e.target.closest("[data-action='delete']")) return;
+        const id = item.getAttribute("data-wishlist-id");
+        const park = (window.PARKS_DATA || []).find(p => p.id === id);
+        if (park) {
+          this.closeWishlist();
+          this.openDrawer(park);
+          this.map.selectPark(id);
+        }
       });
     });
 
     this.dom.wishlistList.querySelectorAll("[data-action='delete']").forEach(btn => {
-      btn.addEventListener("click", () => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
         const id = btn.getAttribute("data-id");
         window.storage.toggleFavorite(id);
         this.updateWishlistCount();

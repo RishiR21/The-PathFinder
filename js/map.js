@@ -230,6 +230,10 @@ class TerrainMap {
         this.justClickedMarker = true;
         setTimeout(() => { this.justClickedMarker = false; }, 350);
         this.selectPark(park.id, true);
+        if (window.terrainUI) {
+          window.terrainUI.openDrawer(park);
+          window.terrainUI.highlightActiveCard(park.id);
+        }
       });
 
       this.markerMap.set(park.id, marker);
