@@ -683,25 +683,46 @@ a {
   box-shadow: 0 0 16px rgba(16, 185, 129, 0.2);
 }
 
+@keyframes photoShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
 .park-card-media {
-  width: 96px;
-  height: 88px;
-  border-radius: var(--radius-sm);
+  width: 104px;
+  height: 86px;
+  aspect-ratio: 5 / 4;
+  border-radius: var(--radius-md);
   overflow: hidden;
   position: relative;
   flex-shrink: 0;
-  background: #182c22;
+  background: linear-gradient(90deg, #0c1a14 0%, #183526 50%, #0c1a14 100%);
+  background-size: 200% 100%;
+  animation: photoShimmer 2s infinite ease-in-out;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
 }
 
 .park-card-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s ease;
+  object-position: center;
+  opacity: 0;
+  transition: opacity 0.35s ease-out, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), filter 0.3s ease;
+}
+
+.park-card-img.is-loaded {
+  opacity: 1;
 }
 
 .park-card:hover .park-card-img {
   transform: scale(1.06);
+  filter: brightness(1.06);
 }
 
 .park-card-bookmark-btn {
@@ -1141,10 +1162,13 @@ a {
 }
 
 .map-popup-img {
-  height: 110px;
+  height: 124px;
+  aspect-ratio: 16 / 9;
   background-size: cover;
   background-position: center;
   position: relative;
+  background-color: #0c1a14;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .map-popup-body {
@@ -1237,21 +1261,32 @@ a {
 
 .drawer-header-banner {
   position: relative;
-  height: 220px;
+  height: 245px;
   overflow: hidden;
   flex-shrink: 0;
+  background: linear-gradient(90deg, #0c1a14 0%, #183526 50%, #0c1a14 100%);
+  background-size: 200% 100%;
+  animation: photoShimmer 2s infinite ease-in-out;
 }
 
 .drawer-hero-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
+  opacity: 0;
+  transition: opacity 0.4s ease-out, transform 0.5s ease;
+}
+
+.drawer-hero-img.is-loaded {
+  opacity: 1;
 }
 
 .drawer-hero-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, var(--bg-panel) 5%, rgba(13, 30, 22, 0.4) 60%, transparent 100%);
+  background: linear-gradient(to top, var(--bg-panel) 0%, rgba(13, 30, 22, 0.35) 55%, rgba(0, 0, 0, 0.2) 100%);
+  pointer-events: none;
 }
 
 .drawer-close-btn {
@@ -1578,10 +1613,16 @@ a {
 }
 
 .wishlist-item-img {
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
+  aspect-ratio: 1 / 1;
   border-radius: var(--radius-sm);
   object-fit: cover;
+  object-position: center;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(90deg, #0c1a14 0%, #183526 50%, #0c1a14 100%);
+  background-size: 200% 100%;
+  animation: photoShimmer 2s infinite ease-in-out;
 }
 
 .wishlist-item-info {
@@ -1755,10 +1796,16 @@ a {
 }
 
 .journey-item-img {
-  width: 44px;
-  height: 44px;
+  width: 50px;
+  height: 50px;
+  aspect-ratio: 1 / 1;
   border-radius: var(--radius-sm);
   object-fit: cover;
+  object-position: center;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(90deg, #0c1a14 0%, #183526 50%, #0c1a14 100%);
+  background-size: 200% 100%;
+  animation: photoShimmer 2s infinite ease-in-out;
 }
 
 .journey-item-info {

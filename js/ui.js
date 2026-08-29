@@ -546,7 +546,7 @@ function getFlagSvg(country) {
 
       card.innerHTML = `
         <div class="park-card-media">
-          <img src="${park.heroImage}" alt="${park.name}" loading="lazy" class="park-card-img" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80';" />
+          <img src="${park.heroImage}" alt="${park.name}" loading="lazy" class="park-card-img" onload="this.classList.add('is-loaded')" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80'; this.classList.add('is-loaded');" />
           <button class="park-card-bookmark-btn ${isFav ? "is-active" : ""}" title="Save to Bucket List" data-fav-id="${park.id}">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="${isFav ? "#f59e0b" : "none"}" stroke="currentColor" stroke-width="2">
               <path d="M19 21l-7-5l-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
@@ -597,10 +597,18 @@ function getFlagSvg(country) {
     const typeLabel = park.type === "national" ? "National Park" : "State / Provincial Park";
 
     if (this.dom.drawerHeroImg) {
+      this.dom.drawerHeroImg.classList.remove("is-loaded");
+      this.dom.drawerHeroImg.onload = () => {
+        this.dom.drawerHeroImg.classList.add("is-loaded");
+      };
       this.dom.drawerHeroImg.onerror = () => {
         this.dom.drawerHeroImg.src = "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80";
+        this.dom.drawerHeroImg.classList.add("is-loaded");
       };
       this.dom.drawerHeroImg.src = park.heroImage;
+      if (this.dom.drawerHeroImg.complete) {
+        this.dom.drawerHeroImg.classList.add("is-loaded");
+      }
     }
     if (this.dom.drawerTitle) this.dom.drawerTitle.textContent = park.name;
     if (this.dom.drawerCountryBadge) this.dom.drawerCountryBadge.innerHTML = `${flag} <span>${countryName}</span>`;
