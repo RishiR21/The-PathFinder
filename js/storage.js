@@ -56,6 +56,14 @@ class StorageManager {
     return [...this.favorites];
   }
 
+  setFavorites(list) {
+    if (Array.isArray(list)) {
+      this.favorites = [...list];
+      this.save(STORAGE_KEYS.FAVORITES, this.favorites);
+      this.notify("favorites_changed", { list: this.favorites });
+    }
+  }
+
   isFavorite(parkId) {
     return this.favorites.includes(parkId);
   }
@@ -72,6 +80,9 @@ class StorageManager {
     }
     this.save(STORAGE_KEYS.FAVORITES, this.favorites);
     this.notify("favorites_changed", { parkId, isFavorite: isFav, list: this.favorites });
+    if (window.supabaseService && window.supabaseService.currentUser) {
+      window.supabaseService.pushLocalChanges();
+    }
     return isFav;
   }
 
@@ -79,11 +90,26 @@ class StorageManager {
     this.favorites = [];
     this.save(STORAGE_KEYS.FAVORITES, this.favorites);
     this.notify("favorites_cleared", []);
+    if (window.supabaseService && window.supabaseService.currentUser) {
+      window.supabaseService.pushLocalChanges();
+    }
   }
 
   // --- Visited / Personal Journey Log ---
+  getVisited() {
+    return { ...this.visited };
+  }
+
   getVisitedMap() {
     return { ...this.visited };
+  }
+
+  setVisited(map) {
+    if (map && typeof map === "object") {
+      this.visited = { ...map };
+      this.save(STORAGE_KEYS.VISITED, this.visited);
+      this.notify("visited_changed", { visited: this.visited });
+    }
   }
 
   getVisitedList() {
@@ -107,6 +133,9 @@ class StorageManager {
     this.visited[parkId] = entry;
     this.save(STORAGE_KEYS.VISITED, this.visited);
     this.notify("visit_logged", { parkId, entry });
+    if (window.supabaseService && window.supabaseService.currentUser) {
+      window.supabaseService.pushLocalChanges();
+    }
     return entry;
   }
 
@@ -115,6 +144,9 @@ class StorageManager {
       delete this.visited[parkId];
       this.save(STORAGE_KEYS.VISITED, this.visited);
       this.notify("visit_removed", { parkId });
+      if (window.supabaseService && window.supabaseService.currentUser) {
+        window.supabaseService.pushLocalChanges();
+      }
       return true;
     }
     return false;
@@ -124,6 +156,9 @@ class StorageManager {
     this.visited = {};
     this.save(STORAGE_KEYS.VISITED, this.visited);
     this.notify("visited_cleared", {});
+    if (window.supabaseService && window.supabaseService.currentUser) {
+      window.supabaseService.pushLocalChanges();
+    }
   }
 
   // --- Basemap Preference ---
