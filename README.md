@@ -18,18 +18,6 @@ Live interactive map featuring toggleable park modes, multi-criteria filtering, 
 
 ---
 
-## 🚀 Live Deployment on Vercel
-
-This repository is ready for instant deployment on **Vercel** with zero configuration.
-
-### Deploying via Vercel Dashboard:
-1. Go to [vercel.com](https://vercel.com) and click **"Add New Project"**.
-2. Select your GitHub repository **`RishiR21/The-PathFinder`**.
-3. Leave Framework Preset as **Other / None** (standard static site).
-4. Click **Deploy**! 🚀
-
----
-
 ## 💻 Running Locally
 
 You can run the project locally without any dependencies:
