@@ -18,12 +18,59 @@ class TerrainUI {
       navBrandLogo: document.getElementById("nav-brand-logo"),
 
       // Header Buttons
+      authModalBtn: document.getElementById("auth-modal-btn"),
+      authBtnIcon: document.getElementById("auth-btn-icon"),
+      authBtnLabel: document.getElementById("auth-btn-label"),
+      authSyncDot: document.getElementById("auth-sync-dot"),
       journeyModalBtn: document.getElementById("journey-modal-btn"),
       journeyBadgeCount: document.getElementById("journey-badge-count"),
       wishlistToggleBtn: document.getElementById("wishlist-toggle-btn"),
       wishlistBadgeCount: document.getElementById("wishlist-badge-count"),
       surpriseBtn: document.getElementById("surprise-me-btn"),
       aboutModalBtn: document.getElementById("about-modal-btn"),
+
+      // Auth Modal Elements
+      authModal: document.getElementById("auth-modal"),
+      authModalCloseBtn: document.getElementById("auth-modal-close-btn"),
+      authModalBackdrop: document.getElementById("auth-modal-backdrop"),
+      authStepEmail: document.getElementById("auth-step-email"),
+      authStepCode: document.getElementById("auth-step-code"),
+      authStepSuccess: document.getElementById("auth-step-success"),
+      authEmailForm: document.getElementById("auth-email-form"),
+      authEmailInput: document.getElementById("auth-email-input"),
+      authSendCodeBtn: document.getElementById("auth-send-code-btn"),
+      authEmailError: document.getElementById("auth-email-error"),
+      authCodeForm: document.getElementById("auth-code-form"),
+      authOtpInput: document.getElementById("auth-otp-input"),
+      authVerifyBtn: document.getElementById("auth-verify-btn"),
+      authCodeError: document.getElementById("auth-code-error"),
+      authCodeSentEmail: document.getElementById("auth-code-sent-email"),
+      authResendBtn: document.getElementById("auth-resend-btn"),
+      authResendTimerText: document.getElementById("auth-resend-timer-text"),
+      authCountdown: document.getElementById("auth-countdown"),
+      authChangeEmailBtn: document.getElementById("auth-change-email-btn"),
+      authSuccessDoneBtn: document.getElementById("auth-success-done-btn"),
+      authConfigToggleBtn: document.getElementById("auth-config-toggle-btn"),
+      authConfigPanel: document.getElementById("auth-config-panel"),
+      supabaseUrlInput: document.getElementById("supabase-url-input"),
+      supabaseKeyInput: document.getElementById("supabase-key-input"),
+      supabaseSaveConfigBtn: document.getElementById("supabase-save-config-btn"),
+
+      // Profile Modal Elements
+      profileModal: document.getElementById("profile-modal"),
+      profileModalCloseBtn: document.getElementById("profile-modal-close-btn"),
+      profileModalBackdrop: document.getElementById("profile-modal-backdrop"),
+      profileAvatarDisplay: document.getElementById("profile-avatar-display"),
+      profileName: document.getElementById("profile-modal-title"),
+      profileEmailDisplay: document.getElementById("profile-email-display"),
+      profileSyncBadge: document.getElementById("profile-sync-badge"),
+      profileStatVisited: document.getElementById("profile-stat-visited"),
+      profileStatWishlist: document.getElementById("profile-stat-wishlist"),
+      profileStatNationalPct: document.getElementById("profile-stat-national-pct"),
+      profileStatStatePct: document.getElementById("profile-stat-state-pct"),
+      profileSyncNowBtn: document.getElementById("profile-sync-now-btn"),
+      profileSignoutBtn: document.getElementById("profile-signout-btn"),
+      profileEmojiBtns: document.querySelectorAll(".profile-emoji-btn"),
 
       // Detail Drawer
       detailDrawer: document.getElementById("detail-drawer"),
@@ -130,6 +177,7 @@ class TerrainUI {
     this.updateWishlistCount();
     this.updateJourneyCount();
     this.updateResetButtonState();
+    this.initSupabaseIntegration();
 
     window.addEventListener("resize", () => this.updatePillScrollButtons());
   }
@@ -411,6 +459,66 @@ class TerrainUI {
     }
     if (this.dom.aboutModalCloseBtn) {
       this.dom.aboutModalCloseBtn.addEventListener("click", () => this.closeAboutModal());
+    }
+
+    // Auth Modal & Profile Modal Handlers
+    if (this.dom.authModalBtn) {
+      this.dom.authModalBtn.addEventListener("click", () => this.openAuthOrProfileModal());
+    }
+    if (this.dom.authModalCloseBtn) {
+      this.dom.authModalCloseBtn.addEventListener("click", () => this.closeAuthModal());
+    }
+    if (this.dom.authModalBackdrop) {
+      this.dom.authModalBackdrop.addEventListener("click", () => this.closeAuthModal());
+    }
+    if (this.dom.authEmailForm) {
+      this.dom.authEmailForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        this.handleSendEmailOtp();
+      });
+    }
+    if (this.dom.authCodeForm) {
+      this.dom.authCodeForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        this.handleVerifyEmailOtp();
+      });
+    }
+    if (this.dom.authResendBtn) {
+      this.dom.authResendBtn.addEventListener("click", () => this.handleSendEmailOtp());
+    }
+    if (this.dom.authChangeEmailBtn) {
+      this.dom.authChangeEmailBtn.addEventListener("click", () => this.showAuthEmailStep());
+    }
+    if (this.dom.authSuccessDoneBtn) {
+      this.dom.authSuccessDoneBtn.addEventListener("click", () => this.closeAuthModal());
+    }
+    if (this.dom.authConfigToggleBtn) {
+      this.dom.authConfigToggleBtn.addEventListener("click", () => this.toggleAuthConfigPanel());
+    }
+    if (this.dom.supabaseSaveConfigBtn) {
+      this.dom.supabaseSaveConfigBtn.addEventListener("click", () => this.handleSaveSupabaseConfig());
+    }
+
+    // Profile Modal Handlers
+    if (this.dom.profileModalCloseBtn) {
+      this.dom.profileModalCloseBtn.addEventListener("click", () => this.closeProfileModal());
+    }
+    if (this.dom.profileModalBackdrop) {
+      this.dom.profileModalBackdrop.addEventListener("click", () => this.closeProfileModal());
+    }
+    if (this.dom.profileSignoutBtn) {
+      this.dom.profileSignoutBtn.addEventListener("click", () => this.handleSignOut());
+    }
+    if (this.dom.profileSyncNowBtn) {
+      this.dom.profileSyncNowBtn.addEventListener("click", () => this.handleSyncNow());
+    }
+    if (this.dom.profileEmojiBtns) {
+      this.dom.profileEmojiBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+          const emoji = btn.getAttribute("data-emoji");
+          this.handleSelectAvatar(emoji);
+        });
+      });
     }
 
     // Photo Lightbox Modal
@@ -1107,6 +1215,323 @@ function getFlagSvg(country) {
 
   closePhotoLightbox() {
     this.dom.photoLightboxModal?.classList.remove("is-open");
+  }
+
+  // --- Supabase Authentication & Profile Controller ---
+
+  initSupabaseIntegration() {
+    if (!window.supabaseService) return;
+
+    // Listen to Auth State changes
+    window.supabaseService.onAuthStateChange((event, session, user, profile) => {
+      this.updateAuthUI(user, profile);
+      this.updateWishlistCount();
+      this.updateJourneyCount();
+      this.renderWishlist();
+      this.renderParksList(this.filter.getFilteredData());
+    });
+
+    // Listen to Cloud Sync changes
+    window.supabaseService.onSyncStatusChange((status, lastTime) => {
+      this.updateSyncStatusUI(status, lastTime);
+    });
+
+    // Initial populate of Supabase settings inputs if stored
+    if (this.dom.supabaseUrlInput) {
+      this.dom.supabaseUrlInput.value = window.supabaseService.url || "";
+    }
+    if (this.dom.supabaseKeyInput) {
+      this.dom.supabaseKeyInput.value = window.supabaseService.anonKey || "";
+    }
+  }
+
+  openAuthOrProfileModal() {
+    if (window.supabaseService && window.supabaseService.currentUser) {
+      this.openProfileModal();
+    } else {
+      this.openAuthModal();
+    }
+  }
+
+  openAuthModal() {
+    this.showAuthEmailStep();
+    if (this.dom.authModal) {
+      this.dom.authModal.style.display = "flex";
+      setTimeout(() => this.dom.authModal.classList.add("is-open"), 10);
+    }
+    if (this.dom.authEmailInput) {
+      setTimeout(() => this.dom.authEmailInput.focus(), 100);
+    }
+  }
+
+  closeAuthModal() {
+    if (this.dom.authModal) {
+      this.dom.authModal.classList.remove("is-open");
+      setTimeout(() => {
+        this.dom.authModal.style.display = "none";
+        this.clearAuthErrors();
+      }, 200);
+    }
+    clearInterval(this.resendInterval);
+  }
+
+  showAuthEmailStep() {
+    if (this.dom.authStepEmail) this.dom.authStepEmail.style.display = "block";
+    if (this.dom.authStepCode) this.dom.authStepCode.style.display = "none";
+    if (this.dom.authStepSuccess) this.dom.authStepSuccess.style.display = "none";
+    this.clearAuthErrors();
+    clearInterval(this.resendInterval);
+  }
+
+  showAuthCodeStep(email) {
+    if (this.dom.authStepEmail) this.dom.authStepEmail.style.display = "none";
+    if (this.dom.authStepCode) this.dom.authStepCode.style.display = "block";
+    if (this.dom.authStepSuccess) this.dom.authStepSuccess.style.display = "none";
+    if (this.dom.authCodeSentEmail) this.dom.authCodeSentEmail.textContent = email;
+    if (this.dom.authOtpInput) {
+      this.dom.authOtpInput.value = "";
+      setTimeout(() => this.dom.authOtpInput.focus(), 100);
+    }
+    this.clearAuthErrors();
+    this.startResendCountdown(45);
+  }
+
+  showAuthSuccessStep() {
+    if (this.dom.authStepEmail) this.dom.authStepEmail.style.display = "none";
+    if (this.dom.authStepCode) this.dom.authStepCode.style.display = "none";
+    if (this.dom.authStepSuccess) this.dom.authStepSuccess.style.display = "block";
+    clearInterval(this.resendInterval);
+  }
+
+  clearAuthErrors() {
+    if (this.dom.authEmailError) {
+      this.dom.authEmailError.textContent = "";
+      this.dom.authEmailError.style.display = "none";
+    }
+    if (this.dom.authCodeError) {
+      this.dom.authCodeError.textContent = "";
+      this.dom.authCodeError.style.display = "none";
+    }
+  }
+
+  startResendCountdown(seconds = 45) {
+    clearInterval(this.resendInterval);
+    let remaining = seconds;
+    if (this.dom.authCountdown) this.dom.authCountdown.textContent = remaining;
+    if (this.dom.authResendTimerText) this.dom.authResendTimerText.style.display = "inline";
+    if (this.dom.authResendBtn) this.dom.authResendBtn.style.display = "none";
+
+    this.resendInterval = setInterval(() => {
+      remaining--;
+      if (this.dom.authCountdown) this.dom.authCountdown.textContent = remaining;
+      if (remaining <= 0) {
+        clearInterval(this.resendInterval);
+        if (this.dom.authResendTimerText) this.dom.authResendTimerText.style.display = "none";
+        if (this.dom.authResendBtn) this.dom.authResendBtn.style.display = "inline-block";
+      }
+    }, 1000);
+  }
+
+  async handleSendEmailOtp() {
+    const email = (this.dom.authEmailInput?.value || "").trim();
+    if (!email || !email.includes("@")) {
+      this.showAuthError("email", "Please enter a valid email address.");
+      return;
+    }
+
+    if (!window.supabaseService || !window.supabaseService.isConfigured()) {
+      this.showAuthError("email", "Please configure your Supabase Project URL & Key below first.");
+      this.toggleAuthConfigPanel(true);
+      return;
+    }
+
+    try {
+      this.setAuthButtonLoading(this.dom.authSendCodeBtn, true, "Sending Code...");
+      await window.supabaseService.sendEmailOtp(email);
+      this.showAuthCodeStep(email);
+      this.showToast(`Verification code sent to ${email}`, "success");
+    } catch (err) {
+      console.error(err);
+      this.showAuthError("email", err.message || "Could not send verification code. Please check your Supabase credentials.");
+    } finally {
+      this.setAuthButtonLoading(this.dom.authSendCodeBtn, false, "Send Verification Code →");
+    }
+  }
+
+  async handleVerifyEmailOtp() {
+    const email = (this.dom.authEmailInput?.value || "").trim();
+    const token = (this.dom.authOtpInput?.value || "").trim();
+
+    if (!token || token.length < 6) {
+      this.showAuthError("code", "Please enter the complete 6-digit code.");
+      return;
+    }
+
+    try {
+      this.setAuthButtonLoading(this.dom.authVerifyBtn, true, "Verifying...");
+      await window.supabaseService.verifyEmailOtp(email, token);
+      this.showAuthSuccessStep();
+      this.showToast("Signed in successfully! Cloud sync active.", "success");
+    } catch (err) {
+      console.error(err);
+      this.showAuthError("code", err.message || "Invalid or expired verification code. Please try again.");
+    } finally {
+      this.setAuthButtonLoading(this.dom.authVerifyBtn, false, "Verify & Sign In ✓");
+    }
+  }
+
+  showAuthError(type, msg) {
+    const el = type === "email" ? this.dom.authEmailError : this.dom.authCodeError;
+    if (el) {
+      el.textContent = msg;
+      el.style.display = "block";
+    }
+  }
+
+  setAuthButtonLoading(btn, isLoading, text) {
+    if (!btn) return;
+    btn.disabled = isLoading;
+    btn.innerHTML = isLoading ? `<span class="auth-spinner"></span> <span>${text}</span>` : `<span>${text}</span>`;
+  }
+
+  toggleAuthConfigPanel(forceOpen = false) {
+    if (!this.dom.authConfigPanel) return;
+    const isShown = forceOpen || this.dom.authConfigPanel.style.display !== "block";
+    this.dom.authConfigPanel.style.display = isShown ? "block" : "none";
+  }
+
+  handleSaveSupabaseConfig() {
+    const url = (this.dom.supabaseUrlInput?.value || "").trim();
+    const key = (this.dom.supabaseKeyInput?.value || "").trim();
+
+    if (!url || !key) {
+      this.showToast("Please enter both Supabase URL and Anon Key", "warning");
+      return;
+    }
+
+    if (window.supabaseService) {
+      const ok = window.supabaseService.configure(url, key);
+      if (ok) {
+        this.showToast("Supabase configuration saved & connected!", "success");
+        this.toggleAuthConfigPanel(false);
+        this.clearAuthErrors();
+      } else {
+        this.showToast("Failed to initialize Supabase client. Check URL/Key format.", "error");
+      }
+    }
+  }
+
+  // --- Profile Modal Controller ---
+
+  openProfileModal() {
+    const user = window.supabaseService?.currentUser;
+    const profile = window.supabaseService?.currentProfile;
+    if (!user) {
+      this.openAuthModal();
+      return;
+    }
+
+    const email = user.email || "explorer@example.com";
+    const name = profile?.full_name || email.split("@")[0];
+    const avatar = profile?.avatar_emoji || "🌲";
+
+    if (this.dom.profileName) this.dom.profileName.textContent = name;
+    if (this.dom.profileEmailDisplay) this.dom.profileEmailDisplay.textContent = email;
+    if (this.dom.profileAvatarDisplay) this.dom.profileAvatarDisplay.textContent = avatar;
+
+    // Update Travel Stats
+    const stats = window.passport ? window.passport.calculateStats() : { visitedCount: 0 };
+    const favCount = window.storage ? window.storage.getFavorites().length : 0;
+    const allParks = window.PARKS_DATA || [];
+    const nationalTotal = allParks.filter(p => p.type === "national").length || 85;
+    const stateTotal = allParks.filter(p => p.type === "state").length || 85;
+
+    const visitedNational = (stats.visitedParks || []).filter(p => p.type === "national").length;
+    const visitedState = (stats.visitedParks || []).filter(p => p.type === "state").length;
+
+    if (this.dom.profileStatVisited) this.dom.profileStatVisited.textContent = stats.visitedCount || 0;
+    if (this.dom.profileStatWishlist) this.dom.profileStatWishlist.textContent = favCount;
+    if (this.dom.profileStatNationalPct) this.dom.profileStatNationalPct.textContent = `${Math.round((visitedNational / nationalTotal) * 100)}%`;
+    if (this.dom.profileStatStatePct) this.dom.profileStatStatePct.textContent = `${Math.round((visitedState / stateTotal) * 100)}%`;
+
+    if (this.dom.profileModal) {
+      this.dom.profileModal.style.display = "flex";
+      setTimeout(() => this.dom.profileModal.classList.add("is-open"), 10);
+    }
+  }
+
+  closeProfileModal() {
+    if (this.dom.profileModal) {
+      this.dom.profileModal.classList.remove("is-open");
+      setTimeout(() => {
+        this.dom.profileModal.style.display = "none";
+      }, 200);
+    }
+  }
+
+  async handleSelectAvatar(emoji) {
+    if (!emoji || !window.supabaseService) return;
+    if (this.dom.profileAvatarDisplay) this.dom.profileAvatarDisplay.textContent = emoji;
+    if (this.dom.authBtnIcon) this.dom.authBtnIcon.textContent = emoji;
+
+    try {
+      await window.supabaseService.updateProfile({ avatar_emoji: emoji });
+      this.showToast(`Avatar updated to ${emoji}`, "success");
+    } catch (e) {
+      console.warn("Could not save avatar to cloud:", e);
+    }
+  }
+
+  async handleSyncNow() {
+    if (!window.supabaseService) return;
+    try {
+      this.showToast("Synchronizing with Supabase cloud...", "info");
+      await window.supabaseService.syncWithCloud();
+      this.updateWishlistCount();
+      this.updateJourneyCount();
+      this.renderWishlist();
+      this.renderParksList(this.filter.getFilteredData());
+      this.showToast("Cloud sync complete! All changes up to date.", "success");
+    } catch (e) {
+      this.showToast("Cloud sync failed. Check connection.", "warning");
+    }
+  }
+
+  async handleSignOut() {
+    if (window.supabaseService) {
+      await window.supabaseService.signOut();
+    }
+    this.closeProfileModal();
+    this.showToast("Signed out of PathFinder.", "info");
+  }
+
+  updateAuthUI(user, profile) {
+    if (user) {
+      const avatar = profile?.avatar_emoji || "🌲";
+      const name = profile?.full_name || (user.email ? user.email.split("@")[0] : "Explorer");
+      if (this.dom.authBtnIcon) this.dom.authBtnIcon.textContent = avatar;
+      if (this.dom.authBtnLabel) this.dom.authBtnLabel.textContent = name;
+      if (this.dom.authSyncDot) this.dom.authSyncDot.style.display = "inline-block";
+    } else {
+      if (this.dom.authBtnIcon) this.dom.authBtnIcon.textContent = "👤";
+      if (this.dom.authBtnLabel) this.dom.authBtnLabel.textContent = "Sign In";
+      if (this.dom.authSyncDot) this.dom.authSyncDot.style.display = "none";
+    }
+  }
+
+  updateSyncStatusUI(status, lastTime) {
+    if (this.dom.profileSyncBadge) {
+      if (status === "syncing") {
+        this.dom.profileSyncBadge.textContent = "🔄 Syncing with Cloud...";
+        this.dom.profileSyncBadge.className = "profile-sync-status-badge is-syncing";
+      } else if (status === "synced") {
+        this.dom.profileSyncBadge.textContent = "☁️ Cloud Synced";
+        this.dom.profileSyncBadge.className = "profile-sync-status-badge is-synced";
+      } else if (status === "error") {
+        this.dom.profileSyncBadge.textContent = "⚠ Sync Offline";
+        this.dom.profileSyncBadge.className = "profile-sync-status-badge is-error";
+      }
+    }
   }
 
   // Toast Notification System

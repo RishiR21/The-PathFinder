@@ -21,6 +21,8 @@
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <link rel="apple-touch-icon" href="favicon.svg" />
   <meta name="theme-color" content="#08120d" />
+  <!-- Supabase Client SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <!-- App Styles -->
   <link rel="stylesheet" href="styles.css" />
@@ -72,7 +74,7 @@
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
-          <input type="text" id="search-input" class="search-input" placeholder="Search all 112 parks, states, trails, activities..." aria-label="Search parks" autocomplete="off" />
+          <input type="text" id="search-input" class="search-input" placeholder="Search all 170 parks, states, trails, activities..." aria-label="Search parks" autocomplete="off" />
           <div class="search-trailing">
             <kbd class="search-kbd-badge" title="Press / to focus search">/</kbd>
             <button id="search-clear-btn" class="search-clear-btn" title="Clear search">✕</button>
@@ -82,6 +84,13 @@
 
       <!-- Header Action Buttons -->
       <div class="header-actions">
+        <!-- Account / Cloud Sync Button -->
+        <button id="auth-modal-btn" class="header-action-btn auth-btn" title="Sign In &amp; Sync with Cloud">
+          <span id="auth-btn-icon">👤</span>
+          <span id="auth-btn-label">Sign In</span>
+          <span id="auth-sync-dot" class="auth-sync-dot" style="display: none;" title="Cloud Synced"></span>
+        </button>
+
         <!-- My Journey / Visited Log -->
         <button id="journey-modal-btn" class="header-action-btn journey-btn" title="View My Visited Parks &amp; Travel Journal">
           <span>🌲 My Journey</span>
@@ -511,6 +520,158 @@
       </div>
     </div>
 
+    <!-- EMAIL OTP AUTHENTICATION MODAL -->
+    <div id="auth-modal" class="modal-dialog-wrapper" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title" style="display: none;">
+      <div class="modal-backdrop" id="auth-modal-backdrop"></div>
+      <div class="modal-content auth-modal-box">
+        <button id="auth-modal-close-btn" class="modal-close-btn" aria-label="Close dialog">&times;</button>
+        
+        <!-- Step 1: Email Form -->
+        <div id="auth-step-email" class="auth-step">
+          <div class="auth-header">
+            <div class="auth-icon-badge">🌲</div>
+            <h3 id="auth-modal-title" class="auth-title">Welcome to PathFinder</h3>
+            <p class="auth-subtitle">Sign in to save your Bucket List, Visited Parks, and Travel Notes across all your devices.</p>
+          </div>
+
+          <form id="auth-email-form" class="auth-form" onsubmit="return false;">
+            <div class="auth-input-group">
+              <label for="auth-email-input" class="auth-label">Email Address</label>
+              <div class="auth-input-wrapper">
+                <span class="auth-input-icon">✉️</span>
+                <input type="email" id="auth-email-input" class="auth-input" placeholder="explorer@example.com" required autocomplete="email" />
+              </div>
+              <p class="auth-input-hint">We'll email you a secure 6-digit verification code. No password needed!</p>
+            </div>
+
+            <div id="auth-email-error" class="auth-error-msg" style="display: none;"></div>
+
+            <button type="submit" id="auth-send-code-btn" class="auth-primary-btn">
+              <span>Send Verification Code</span>
+              <span class="auth-btn-arrow">→</span>
+            </button>
+          </form>
+
+          <!-- Supabase Config Toggle for Custom Credentials -->
+          <div class="auth-config-footer">
+            <button id="auth-config-toggle-btn" class="auth-config-link" type="button">⚙️ Supabase Project Settings</button>
+            <div id="auth-config-panel" class="auth-config-panel" style="display: none;">
+              <p class="auth-config-help">Connect your Supabase project (URL &amp; Anon Key) to enable cloud sync:</p>
+              <input type="text" id="supabase-url-input" class="auth-config-input" placeholder="https://xyzcompany.supabase.co" />
+              <input type="password" id="supabase-key-input" class="auth-config-input" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." />
+              <button id="supabase-save-config-btn" class="auth-config-save-btn" type="button">Save Settings</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: 6-Digit OTP Code Form -->
+        <div id="auth-step-code" class="auth-step" style="display: none;">
+          <div class="auth-header">
+            <div class="auth-icon-badge">📬</div>
+            <h3 class="auth-title">Check Your Email</h3>
+            <p class="auth-subtitle">We sent a 6-digit code to <strong id="auth-code-sent-email"></strong>.</p>
+          </div>
+
+          <form id="auth-code-form" class="auth-form" onsubmit="return false;">
+            <div class="auth-input-group">
+              <label for="auth-otp-input" class="auth-label">6-Digit Verification Code</label>
+              <input type="text" id="auth-otp-input" class="auth-otp-input" placeholder="123456" maxlength="6" pattern="[0-9]{6}" autocomplete="one-time-code" inputmode="numeric" required />
+            </div>
+
+            <div id="auth-code-error" class="auth-error-msg" style="display: none;"></div>
+
+            <button type="submit" id="auth-verify-btn" class="auth-primary-btn">
+              <span>Verify &amp; Sign In</span>
+              <span class="auth-btn-arrow">✓</span>
+            </button>
+
+            <div class="auth-resend-row">
+              <span id="auth-resend-timer-text">Resend code in <strong id="auth-countdown">45</strong>s</span>
+              <button id="auth-resend-btn" class="auth-resend-btn" type="button" style="display: none;">Resend Code</button>
+              <button id="auth-change-email-btn" class="auth-change-email-btn" type="button">Change Email</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Step 3: Success State -->
+        <div id="auth-step-success" class="auth-step" style="display: none;">
+          <div class="auth-header">
+            <div class="auth-success-badge">✓</div>
+            <h3 class="auth-title">You're Signed In!</h3>
+            <p class="auth-subtitle">Your saved parks and travel notes are now securely synced to the cloud.</p>
+          </div>
+          <button id="auth-success-done-btn" class="auth-primary-btn" type="button">Start Exploring</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- USER PROFILE & CLOUD SYNC MODAL -->
+    <div id="profile-modal" class="modal-dialog-wrapper" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title" style="display: none;">
+      <div class="modal-backdrop" id="profile-modal-backdrop"></div>
+      <div class="modal-content profile-modal-box">
+        <button id="profile-modal-close-btn" class="modal-close-btn" aria-label="Close dialog">&times;</button>
+        
+        <div class="profile-header">
+          <div class="profile-avatar-wrapper">
+            <span id="profile-avatar-display" class="profile-avatar-emoji">🌲</span>
+          </div>
+          <div class="profile-user-info">
+            <h3 id="profile-modal-title" class="profile-name">Explorer</h3>
+            <p id="profile-email-display" class="profile-email">explorer@example.com</p>
+            <span id="profile-sync-badge" class="profile-sync-status-badge">☁️ Cloud Synced</span>
+          </div>
+        </div>
+
+        <!-- Emoji Avatar Selector -->
+        <div class="profile-avatar-picker-section">
+          <label class="profile-section-label">Choose Traveler Avatar</label>
+          <div class="profile-emoji-grid">
+            <button type="button" class="profile-emoji-btn" data-emoji="🌲">🌲</button>
+            <button type="button" class="profile-emoji-btn" data-emoji="🏔️">🏔️</button>
+            <button type="button" class="profile-emoji-btn" data-emoji="⛺">⛺</button>
+            <button type="button" class="profile-emoji-btn" data-emoji="🐻">🐻</button>
+            <button type="button" class="profile-emoji-btn" data-emoji="🦅">🦅</button>
+            <button type="button" class="profile-emoji-btn" data-emoji="🌊">🌊</button>
+            <button type="button" class="profile-emoji-btn" data-emoji="🥾">🥾</button>
+            <button type="button" class="profile-emoji-btn" data-emoji="🌅">🌅</button>
+            <button type="button" class="profile-emoji-btn" data-emoji="🍂">🍂</button>
+            <button type="button" class="profile-emoji-btn" data-emoji="🦌">🦌</button>
+          </div>
+        </div>
+
+        <!-- Stats Overview -->
+        <div class="profile-stats-grid">
+          <div class="profile-stat-card">
+            <span id="profile-stat-visited" class="profile-stat-num">0</span>
+            <span class="profile-stat-lbl">Parks Visited</span>
+          </div>
+          <div class="profile-stat-card">
+            <span id="profile-stat-wishlist" class="profile-stat-num">0</span>
+            <span class="profile-stat-lbl">In Bucket List</span>
+          </div>
+          <div class="profile-stat-card">
+            <span id="profile-stat-national-pct" class="profile-stat-num">0%</span>
+            <span class="profile-stat-lbl">National Parks</span>
+          </div>
+          <div class="profile-stat-card">
+            <span id="profile-stat-state-pct" class="profile-stat-num">0%</span>
+            <span class="profile-stat-lbl">State Parks</span>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="profile-actions-row">
+          <button id="profile-sync-now-btn" class="profile-sync-btn" type="button">
+            <span>🔄 Sync Now</span>
+          </button>
+          <button id="profile-signout-btn" class="profile-signout-btn" type="button">
+            <span>Sign Out</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- FULL PHOTO LIGHTBOX MODAL -->
     <div id="photo-lightbox-modal" class="photo-lightbox-modal" role="dialog" aria-modal="true" aria-label="Full Photo">
       <div class="photo-lightbox-backdrop" id="photo-lightbox-backdrop"></div>
@@ -549,6 +710,7 @@
 
   <!-- Application Scripts -->
   <script src="js/data.js"></script>
+  <script src="js/supabase.js"></script>
   <script src="js/storage.js"></script>
   <script src="js/passport.js"></script>
   <script src="js/filters.js"></script>
