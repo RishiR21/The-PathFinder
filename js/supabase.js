@@ -13,8 +13,11 @@ class SupabaseService {
     this.isSyncing = false;
     this.lastSyncTime = null;
 
+    // Default Project Configuration (gankykqrasfcsifagfjv)
+    const DEFAULT_URL = "https://gankykqrasfcsifagfjv.supabase.co";
+
     // Load credentials from localStorage or defaults
-    this.url = localStorage.getItem("pathfinder_supabase_url") || "";
+    this.url = localStorage.getItem("pathfinder_supabase_url") || DEFAULT_URL;
     this.anonKey = localStorage.getItem("pathfinder_supabase_key") || "";
 
     this.init();
