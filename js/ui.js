@@ -471,6 +471,15 @@ class TerrainUI {
     if (this.dom.authModalBackdrop) {
       this.dom.authModalBackdrop.addEventListener("click", () => this.closeAuthModal());
     }
+    if (this.dom.authOtpInput) {
+      this.dom.authOtpInput.addEventListener("input", (e) => {
+        const val = (e.target.value || "").replace(/\D/g, "");
+        e.target.value = val;
+        if (val.length === 6) {
+          this.handleVerifyEmailOtp();
+        }
+      });
+    }
     if (this.dom.authEmailForm) {
       this.dom.authEmailForm.addEventListener("submit", (e) => {
         e.preventDefault();
@@ -498,6 +507,13 @@ class TerrainUI {
     if (this.dom.supabaseSaveConfigBtn) {
       this.dom.supabaseSaveConfigBtn.addEventListener("click", () => this.handleSaveSupabaseConfig());
     }
+
+    // Global ESC Key Listener to dismiss any active modal, lightbox, or drawer
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" || e.keyCode === 27) {
+        this.closeAllModalsAndDrawers();
+      }
+    });
 
     // Profile Modal Handlers
     if (this.dom.profileModalCloseBtn) {
@@ -1264,6 +1280,17 @@ function getFlagSvg(country) {
     }
   }
 
+  closeAllModalsAndDrawers() {
+    this.closeAuthModal();
+    this.closeProfileModal();
+    this.closeJourneyModal();
+    this.closeWishlist();
+    this.closeVisitModal();
+    this.closeAboutModal();
+    this.closePhotoLightbox();
+    this.closeDrawer();
+  }
+
   closeAuthModal() {
     if (this.dom.authModal) {
       this.dom.authModal.classList.remove("is-open");
@@ -1410,13 +1437,18 @@ function getFlagSvg(country) {
     }
 
     if (window.supabaseService) {
-      const ok = window.supabaseService.configure(url, key);
-      if (ok) {
-        this.showToast("Supabase configuration saved & connected!", "success");
-        this.toggleAuthConfigPanel(false);
-        this.clearAuthErrors();
-      } else {
-        this.showToast("Failed to initialize Supabase client. Check URL/Key format.", "error");
+      try {
+        const ok = window.supabaseService.configure(url, key);
+        if (ok) {
+          this.showToast("Supabase configuration saved & connected!", "success");
+          this.toggleAuthConfigPanel(false);
+          this.clearAuthErrors();
+        } else {
+          this.showToast("Failed to initialize Supabase client. Check URL/Key format.", "error");
+        }
+      } catch (err) {
+        this.showToast(err.message || "Invalid Supabase key", "error");
+        this.showAuthError("email", err.message);
       }
     }
   }

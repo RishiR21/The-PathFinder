@@ -76,6 +76,22 @@ class SupabaseService {
   configure(url, anonKey) {
     this.url = (url || "").trim();
     this.anonKey = (anonKey || "").trim();
+
+    // Check if user accidentally pasted service_role secret key
+    try {
+      const parts = this.anonKey.split(".");
+      if (parts.length === 3) {
+        const payload = JSON.parse(atob(parts[1]));
+        if (payload.role === "service_role") {
+          throw new Error("You pasted the 'service_role' (secret) key. Please copy the 'anon' (public) key from your Supabase API Settings instead.");
+        }
+      }
+    } catch (err) {
+      if (err.message.includes("service_role")) {
+        throw err;
+      }
+    }
+
     localStorage.setItem("pathfinder_supabase_url", this.url);
     localStorage.setItem("pathfinder_supabase_key", this.anonKey);
     this.init();
@@ -107,10 +123,13 @@ class SupabaseService {
       throw new Error("Please provide a valid email address.");
     }
 
+    const redirectUrl = window.location.origin + window.location.pathname;
+
     const { data, error } = await this.client.auth.signInWithOtp({
       email: cleanEmail,
       options: {
-        shouldCreateUser: true
+        shouldCreateUser: true,
+        emailRedirectTo: redirectUrl
       }
     });
 
@@ -130,11 +149,25 @@ class SupabaseService {
     const cleanEmail = (email || "").trim().toLowerCase();
     const cleanToken = (token || "").trim().replace(/\s+/g, "");
 
-    const { data, error } = await this.client.auth.verifyOtp({
+    // Attempt verification with 'email' (Magic Link/OTP) type
+    let { data, error } = await this.client.auth.verifyOtp({
       email: cleanEmail,
       token: cleanToken,
       type: "email"
     });
+
+    // If 'email' type fails, retry with 'signup' in case it's a new unconfirmed user
+    if (error && error.message && error.message.toLowerCase().includes("invalid")) {
+      const signupAttempt = await this.client.auth.verifyOtp({
+        email: cleanEmail,
+        token: cleanToken,
+        type: "signup"
+      });
+      if (!signupAttempt.error) {
+        data = signupAttempt.data;
+        error = null;
+      }
+    }
 
     if (error) {
       throw error;
