@@ -2736,14 +2736,80 @@ a {
    SUPABASE AUTH & USER PROFILE MODAL STYLES
    ============================================================================== */
 
+.modal-dialog-wrapper {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.22s ease, visibility 0.22s ease;
+  padding: 16px;
+}
+
+.modal-dialog-wrapper.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.modal-dialog-wrapper .modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(3, 8, 5, 0.82);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
 .auth-modal-box, .profile-modal-box {
-  max-width: 440px !important;
-  width: 92vw;
-  background: #0f1c14 !important;
-  border: 1px solid rgba(52, 211, 153, 0.25) !important;
-  border-radius: var(--radius-lg);
-  padding: 28px 24px !important;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 30px rgba(16, 185, 129, 0.1) !important;
+  position: relative;
+  z-index: 10;
+  max-width: 420px !important;
+  width: 100% !important;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: #0d1912 !important;
+  border: 1px solid rgba(52, 211, 153, 0.28) !important;
+  border-radius: 18px !important;
+  padding: 32px 26px 26px !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(16, 185, 129, 0.15) !important;
+  transform: scale(0.94) translateY(10px);
+  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-dialog-wrapper.is-open .auth-modal-box,
+.modal-dialog-wrapper.is-open .profile-modal-box {
+  transform: scale(1) translateY(0);
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #94a3b8;
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.18s ease;
+  z-index: 20;
+}
+
+.modal-close-btn:hover {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: #ef4444;
+  color: #fff;
+  transform: scale(1.1);
 }
 
 .auth-header {
