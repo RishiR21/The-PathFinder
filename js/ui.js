@@ -1410,13 +1410,18 @@ function getFlagSvg(country) {
     }
 
     if (window.supabaseService) {
-      const ok = window.supabaseService.configure(url, key);
-      if (ok) {
-        this.showToast("Supabase configuration saved & connected!", "success");
-        this.toggleAuthConfigPanel(false);
-        this.clearAuthErrors();
-      } else {
-        this.showToast("Failed to initialize Supabase client. Check URL/Key format.", "error");
+      try {
+        const ok = window.supabaseService.configure(url, key);
+        if (ok) {
+          this.showToast("Supabase configuration saved & connected!", "success");
+          this.toggleAuthConfigPanel(false);
+          this.clearAuthErrors();
+        } else {
+          this.showToast("Failed to initialize Supabase client. Check URL/Key format.", "error");
+        }
+      } catch (err) {
+        this.showToast(err.message || "Invalid Supabase key", "error");
+        this.showAuthError("email", err.message);
       }
     }
   }

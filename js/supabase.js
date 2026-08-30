@@ -76,6 +76,22 @@ class SupabaseService {
   configure(url, anonKey) {
     this.url = (url || "").trim();
     this.anonKey = (anonKey || "").trim();
+
+    // Check if user accidentally pasted service_role secret key
+    try {
+      const parts = this.anonKey.split(".");
+      if (parts.length === 3) {
+        const payload = JSON.parse(atob(parts[1]));
+        if (payload.role === "service_role") {
+          throw new Error("You pasted the 'service_role' (secret) key. Please copy the 'anon' (public) key from your Supabase API Settings instead.");
+        }
+      }
+    } catch (err) {
+      if (err.message.includes("service_role")) {
+        throw err;
+      }
+    }
+
     localStorage.setItem("pathfinder_supabase_url", this.url);
     localStorage.setItem("pathfinder_supabase_key", this.anonKey);
     this.init();
