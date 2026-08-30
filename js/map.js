@@ -22,16 +22,15 @@ class TerrainMap {
     this.justClickedMarker = false;
     this.listeners = [];
 
-    // High-Definition Basemap tile layers
+    // High-Definition, Watermark-Free Basemap tile layers
     this.basemaps = {
       terrain: L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}", {
         maxZoom: 18,
-        attribution: "Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, METI, TomTom"
+        attribution: "Tiles &copy; Esri &mdash; Topo Map"
       }),
-      voyager: L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
-        subdomains: "abcd",
-        maxZoom: 19,
-        attribution: "&copy; CartoDB"
+      voyager: L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}", {
+        maxZoom: 18,
+        attribution: "Tiles &copy; Esri &mdash; Street Explorer"
       }),
       satellite: L.layerGroup([
         L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
@@ -42,11 +41,15 @@ class TerrainMap {
           maxZoom: 18
         })
       ]),
-      dark: L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
-        subdomains: "abcd",
-        maxZoom: 19,
-        attribution: "&copy; CartoDB"
-      })
+      dark: L.layerGroup([
+        L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}", {
+          maxZoom: 18,
+          attribution: "&copy; Esri &mdash; Dark Canvas"
+        }),
+        L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}", {
+          maxZoom: 18
+        })
+      ])
     };
 
     this.currentBasemapName = "terrain";
