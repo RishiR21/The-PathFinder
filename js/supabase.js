@@ -114,7 +114,7 @@ class SupabaseService {
   /**
    * Step 1: Send a 6-digit OTP code to the user's email
    */
-  async sendEmailOtp(email) {
+  async sendEmailOtp(email, metadata = {}) {
     if (!this.client) {
       throw new Error("Supabase is not configured yet. Please provide your Project URL and Anon Key.");
     }
@@ -125,12 +125,18 @@ class SupabaseService {
 
     const redirectUrl = window.location.origin + window.location.pathname;
 
+    const options = {
+      shouldCreateUser: true,
+      emailRedirectTo: redirectUrl
+    };
+
+    if (metadata && typeof metadata === "object" && Object.keys(metadata).length > 0) {
+      options.data = metadata;
+    }
+
     const { data, error } = await this.client.auth.signInWithOtp({
       email: cleanEmail,
-      options: {
-        shouldCreateUser: true,
-        emailRedirectTo: redirectUrl
-      }
+      options
     });
 
     if (error) {

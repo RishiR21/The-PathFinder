@@ -33,6 +33,13 @@ class TerrainUI {
       authModal: document.getElementById("auth-modal"),
       authModalCloseBtn: document.getElementById("auth-modal-close-btn"),
       authModalBackdrop: document.getElementById("auth-modal-backdrop"),
+      authTabSignIn: document.getElementById("auth-tab-signin"),
+      authTabSignUp: document.getElementById("auth-tab-signup"),
+      authModalTitle: document.getElementById("auth-modal-title"),
+      authModalDesc: document.getElementById("auth-modal-desc"),
+      authNameGroup: document.getElementById("auth-name-group"),
+      authNameInput: document.getElementById("auth-name-input"),
+      authSendBtnText: document.getElementById("auth-send-btn-text"),
       authStepEmail: document.getElementById("auth-step-email"),
       authStepCode: document.getElementById("auth-step-code"),
       authStepSuccess: document.getElementById("auth-step-success"),
@@ -170,6 +177,7 @@ class TerrainUI {
     };
 
     this.mobileView = "map";
+    this.authMode = "signin";
 
     this.initEventListeners();
     this.renderTagPills();
@@ -462,6 +470,12 @@ class TerrainUI {
     }
 
     // Auth Modal & Profile Modal Handlers
+    if (this.dom.authTabSignIn) {
+      this.dom.authTabSignIn.addEventListener("click", () => this.setAuthMode("signin"));
+    }
+    if (this.dom.authTabSignUp) {
+      this.dom.authTabSignUp.addEventListener("click", () => this.setAuthMode("signup"));
+    }
     if (this.dom.authModalBtn) {
       this.dom.authModalBtn.addEventListener("click", () => this.openAuthOrProfileModal());
     }
@@ -1269,7 +1283,28 @@ function getFlagSvg(country) {
     }
   }
 
-  openAuthModal() {
+  setAuthMode(mode) {
+    this.authMode = mode || "signin";
+    const isSignUp = this.authMode === "signup";
+
+    if (this.dom.authTabSignIn) this.dom.authTabSignIn.classList.toggle("is-active", !isSignUp);
+    if (this.dom.authTabSignUp) this.dom.authTabSignUp.classList.toggle("is-active", isSignUp);
+
+    if (this.dom.authNameGroup) this.dom.authNameGroup.style.display = isSignUp ? "block" : "none";
+    if (this.dom.authModalTitle) this.dom.authModalTitle.textContent = isSignUp ? "Join PathFinder" : "Welcome to PathFinder";
+    if (this.dom.authModalDesc) {
+      this.dom.authModalDesc.textContent = isSignUp
+        ? "Create an explorer profile to save your Bucket List, Visited Parks, and Travel Notes across all your devices."
+        : "Sign in to save your Bucket List, Visited Parks, and Travel Notes across all your devices.";
+    }
+    if (this.dom.authSendBtnText) {
+      this.dom.authSendBtnText.textContent = isSignUp ? "Create Account & Send Code" : "Send Verification Code";
+    }
+    this.clearAuthErrors();
+  }
+
+  openAuthModal(defaultMode = "signin") {
+    this.setAuthMode(defaultMode);
     this.showAuthEmailStep();
     if (this.dom.authModal) {
       this.dom.authModal.style.display = "flex";
@@ -1372,22 +1407,29 @@ function getFlagSvg(country) {
       return;
     }
 
+    const isSignUp = this.authMode === "signup";
+    const name = (this.dom.authNameInput?.value || "").trim();
+    const metadata = isSignUp && name ? { full_name: name } : {};
+
     try {
       this.setAuthButtonLoading(this.dom.authSendCodeBtn, true, "Sending Code...");
-      await window.supabaseService.sendEmailOtp(email);
+      await window.supabaseService.sendEmailOtp(email, metadata);
       this.showAuthCodeStep(email);
       this.showToast(`Verification code sent to ${email}`, "success");
     } catch (err) {
       console.error(err);
       this.showAuthError("email", err.message || "Could not send verification code. Please check your Supabase credentials.");
     } finally {
-      this.setAuthButtonLoading(this.dom.authSendCodeBtn, false, "Send Verification Code →");
+      const defaultText = isSignUp ? "Create Account & Send Code →" : "Send Verification Code →";
+      this.setAuthButtonLoading(this.dom.authSendCodeBtn, false, defaultText);
     }
   }
 
   async handleVerifyEmailOtp() {
     const email = (this.dom.authEmailInput?.value || "").trim();
     const token = (this.dom.authOtpInput?.value || "").trim();
+    const isSignUp = this.authMode === "signup";
+    const name = (this.dom.authNameInput?.value || "").trim();
 
     if (!token || token.length < 6) {
       this.showAuthError("code", "Please enter the complete 6-digit code.");
@@ -1397,8 +1439,14 @@ function getFlagSvg(country) {
     try {
       this.setAuthButtonLoading(this.dom.authVerifyBtn, true, "Verifying...");
       await window.supabaseService.verifyEmailOtp(email, token);
+
+      // If user provided a name during sign up, update profile
+      if (isSignUp && name && window.supabaseService.currentUser) {
+        await window.supabaseService.updateProfile({ full_name: name });
+      }
+
       this.showAuthSuccessStep();
-      this.showToast("Signed in successfully! Cloud sync active.", "success");
+      this.showToast(isSignUp ? "Account created & signed in! Cloud sync active." : "Signed in successfully! Cloud sync active.", "success");
     } catch (err) {
       console.error(err);
       this.showAuthError("code", err.message || "Invalid or expired verification code. Please try again.");
