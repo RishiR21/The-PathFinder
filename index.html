@@ -531,10 +531,25 @@
           <div class="auth-header">
             <div class="auth-icon-badge">🌲</div>
             <h3 id="auth-modal-title" class="auth-title">Welcome to PathFinder</h3>
-            <p class="auth-subtitle">Sign in to save your Bucket List, Visited Parks, and Travel Notes across all your devices.</p>
+            <p id="auth-modal-desc" class="auth-subtitle">Sign in to save your Bucket List, Visited Parks, and Travel Notes across all your devices.</p>
+          </div>
+
+          <!-- Tab Switcher: Sign In vs Create Account -->
+          <div class="auth-tab-group" role="tablist">
+            <button type="button" id="auth-tab-signin" class="auth-tab-btn is-active" role="tab" aria-selected="true">Sign In</button>
+            <button type="button" id="auth-tab-signup" class="auth-tab-btn" role="tab" aria-selected="false">Create Account</button>
           </div>
 
           <form id="auth-email-form" class="auth-form" onsubmit="return false;">
+            <!-- Optional Explorer Name field for Sign Up -->
+            <div id="auth-name-group" class="auth-input-group" style="display: none;">
+              <label for="auth-name-input" class="auth-label">Explorer Name</label>
+              <div class="auth-input-wrapper">
+                <span class="auth-input-icon">👤</span>
+                <input type="text" id="auth-name-input" class="auth-input" placeholder="e.g. Ranger John" autocomplete="name" />
+              </div>
+            </div>
+
             <div class="auth-input-group">
               <label for="auth-email-input" class="auth-label">Email Address</label>
               <div class="auth-input-wrapper">
@@ -547,7 +562,7 @@
             <div id="auth-email-error" class="auth-error-msg" style="display: none;"></div>
 
             <button type="submit" id="auth-send-code-btn" class="auth-primary-btn">
-              <span>Send Verification Code</span>
+              <span id="auth-send-btn-text">Send Verification Code</span>
               <span class="auth-btn-arrow">→</span>
             </button>
           </form>
